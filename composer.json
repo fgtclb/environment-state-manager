@@ -1,0 +1,66 @@
+{
+    "name": "fgtclb/environment-state-manager",
+    "description": "Frontend environment builder and state manager for TYPO3 CMS",
+    "type": "typo3-cms-extension",
+    "homepage": "https://www.fgtclb.com/",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "FGTCLB GmbH",
+            "email": "hello@fgtclb.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1 || ^8.2 || ^8.3 || ^8.4 || ^8.5",
+        "symfony/dependency-injection": "^6.4 || ^7.0",
+        "typo3/cms-core": "^12.4.22 || ^13.4",
+        "typo3/cms-extbase": "^12.4.22 || ^13.4",
+        "typo3/cms-frontend": "^12.4.22 || ^13.4"
+    },
+    "require-dev": {
+        "bnf/phpstan-psr-container": "^1.0.1",
+        "friendsofphp/php-cs-fixer": "^3.80.0",
+        "friendsoftypo3/phpstan-typo3": "^0.9.0",
+        "phpstan/phpdoc-parser": "^1.29.0",
+        "phpstan/phpstan": "^1.12.21",
+        "phpstan/phpstan-phpunit": "^1.4.0",
+        "phpunit/phpunit": "^10.5.45",
+        "sbuerk/typo3-site-based-test-trait": "^1.0.2 || ^2.0.1",
+        "typo3/tailor": "^1.6",
+        "typo3/testing-framework": "^8.2.7"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        },
+        "bin-dir": ".Build/bin",
+        "sort-packages": true,
+        "vendor-dir": ".Build/vendor"
+    },
+    "autoload": {
+        "psr-4": {
+            "FGTCLB\\EnvironmentStateManager\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FGTCLB\\EnvironmentStateManager\\Tests\\": "Tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        },
+        "typo3/cms": {
+            "app-dir": ".Build",
+            "extension-key": "environment_state_manager",
+            "web-dir": ".Build/Web"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/fgtclb/environment-state-manager/issues",
+        "source": "https://github.com/fgtclb/environment-state-manager"
+    }
+}
