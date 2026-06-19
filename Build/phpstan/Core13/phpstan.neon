@@ -1,0 +1,20 @@
+includes:
+  - phpstan-baseline.neon
+  - ../../../.Build/vendor/bnf/phpstan-psr-container/extension.neon
+  - ../../../.Build/vendor/friendsoftypo3/phpstan-typo3/extension.neon
+  - ../../../.Build/vendor/phpstan/phpstan-phpunit/extension.neon
+
+parameters:
+  # Use local .cache dir instead of /tmp
+  tmpDir: ../../../.Build/.cache/phpstan
+
+  level: 8
+
+  paths:
+    - ../../../Classes
+    - ../../../Configuration
+    - ../../../Tests
+
+  excludePaths:
+    - ../../../Classes/Core12/*
+    - ../../../Tests/*/Core12/*
