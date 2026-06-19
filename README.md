@@ -22,9 +22,9 @@ reusable extension.
 
 ## Compatibility
 
-| Extension | TYPO3      | PHP           |
-|-----------|------------|---------------|
-| 1.x       | v12 / v13  | 8.1 – 8.5     |
+| Branch | Extension | TYPO3     | PHP       |
+|--------|-----------|-----------|-----------|
+| main   | 1.x       | v12 / v13 | 8.1 – 8.5 |
 
 ## Installation
 
