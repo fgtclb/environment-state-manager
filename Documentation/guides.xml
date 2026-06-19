@@ -1,0 +1,20 @@
+<guides xmlns="https://www.phpdoc.org/guides"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.phpdoc.org/guides ../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
+        links-are-relative="true"
+>
+    <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               project-home="https://github.com/fgtclb/environment-state-manager"
+               project-contact="hello@fgtclb.com"
+               project-repository="https://github.com/fgtclb/environment-state-manager"
+               project-issues="https://github.com/fgtclb/environment-state-manager/issues"
+               edit-on-github-branch="main"
+               edit-on-github="fgtclb/environment-state-manager"
+               typo3-core-preferred="stable"
+    />
+    <project title="Environment State Manager"
+             release="main (development)"
+             version="main (development)"
+             copyright="since 2026 by FGTCLB GmbH &amp; Contributors"
+    />
+</guides>
