@@ -54,6 +54,39 @@ Build/Scripts/runTests.sh -t 13 -s functional
 
 See `Build/Scripts/runTests.sh -h` for all options.
 
+## Tests
+
+The test suite combines feature tests for the extracted functionality with a
+set of tests adopted from the `fgtclb/academic-*` extension family.
+
+### Feature tests
+
+* `Tests/Unit/EnvironmentBuilderFactoryTest.php` and
+  `Tests/Functional/EnvironmentBuilderFactoryTest.php` cover the
+  `EnvironmentBuilderFactory`, including the TYPO3 core version specific
+  service resolution.
+* `Tests/Functional/Core12` and `Tests/Functional/Core13` hold the
+  `StateManager` functional tests, gated per TYPO3 version through the
+  `not-core-12` / `not-core-13` PHPUnit groups.
+
+### Adopted tests
+
+These tests were adopted from `fgtclb/academic-persons`. Because a standalone
+extension can not depend on the monorepo-only
+`fgtclb/academics-monorepo-testing-helper` package, the underlying traits are
+adopted into this repository under
+`Tests/FunctionalTestCase/` (namespace
+`FGTCLB\EnvironmentStateManager\Tests\FunctionalTestCase`):
+
+* `Tests/Unit/VersionCompatTest.php` and `Tests/Functional/VersionCompatTest.php`
+  use `ExtensionCoreVersionCompatTestsTrait` to assert the supported TYPO3 v12
+  and v13 major versions, as a unit and a functional test respectively.
+* `Tests/Functional/ExtensionLoadedTest.php` uses `ExtensionsLoadedTestsTrait`
+  to verify the extension is registered both by its composer package name
+  (`fgtclb/environment-state-manager`) and its extension key
+  (`environment_state_manager`). The academic extension chain of the original
+  test is reduced to this extension only.
+
 ## License
 
 GPL-2.0-or-later. See [LICENSE](LICENSE).
