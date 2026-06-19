@@ -1,6 +1,6 @@
 {
     "name": "fgtclb/environment-state-manager",
-    "description": "Frontend environment builder and state manager for TYPO3 CMS",
+    "description": "Environment builder and state manager for TYPO3 CMS",
     "type": "typo3-cms-extension",
     "homepage": "https://www.fgtclb.com/",
     "license": "GPL-2.0-or-later",

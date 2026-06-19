@@ -3,12 +3,16 @@
 [![TYPO3 v12](https://img.shields.io/badge/TYPO3-12-orange.svg)](https://get.typo3.org/version/12)
 [![TYPO3 v13](https://img.shields.io/badge/TYPO3-13-orange.svg)](https://get.typo3.org/version/13)
 
-TYPO3 CMS extension providing a frontend environment builder and a state
-manager. It allows code to build and apply a fully featured TYPO3 frontend
-environment (request, `TypoScriptFrontendController` / `ServerRequest` based
-frontend context, TypoScript, language and visibility aspects, …) for a given
-page and to safely back up and restore the global state around such an
-operation.
+TYPO3 CMS extension providing an environment builder and a state manager. It
+allows code to build and apply a fully featured TYPO3 environment (request,
+controller context, `ServerRequest`, TypoScript, language and visibility
+aspects, …) for a given page and to safely back up and restore the global
+state around such an operation.
+
+> **Note:** Currently only **frontend** environment handling is implemented.
+> **Backend** environment handling is planned to be added later. The API is
+> designed around an application type, so backend support can be added without
+> breaking the public interfaces.
 
 This functionality was extracted from `fgtclb/academic-base` into a dedicated,
 reusable extension.
@@ -16,9 +20,10 @@ reusable extension.
 ## Features
 
 * `EnvironmentBuilderFactory` returning a TYPO3 core version compatible
-  `FrontendEnvironmentBuilder` (TYPO3 v12 and v13).
-* `StateManager` to apply and restore a built frontend environment state,
-  emitting `StateApplyEvent` and `StateBackupEvent` PSR-14 events.
+  environment builder (TYPO3 v12 and v13). A `FrontendEnvironmentBuilder` is
+  shipped today; a backend environment builder is planned.
+* `StateManager` to build, apply and restore an environment state, emitting
+  `StateApplyEvent` and `StateBackupEvent` PSR-14 events.
 
 ## Compatibility
 

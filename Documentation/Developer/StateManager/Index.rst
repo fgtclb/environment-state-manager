@@ -7,8 +7,14 @@ State Manager
 =============
 
 The :php:`StateManagerInterface` is the central, public service of this
-extension. It bootstraps a frontend environment for a given context, applies it
-to the global TYPO3 state and is able to back up and restore that state.
+extension. It bootstraps an environment for a given context, applies it to the
+global TYPO3 state and is able to back up and restore that state.
+
+..  note::
+
+    Currently only **frontend** environments are bootstrapped (the examples
+    below use :php:`ApplicationType::FRONTEND`). **Backend** environment
+    handling is planned to be added later.
 
 The state manager is registered as a public service and resolved to a TYPO3
 core version compatible implementation. Inject it through dependency injection:
@@ -24,10 +30,10 @@ core version compatible implementation. Inject it through dependency injection:
         ) {}
     }
 
-Execute code within a frontend environment
-==========================================
+Execute code within an environment
+==================================
 
-The recommended way to run code inside a built frontend environment is the
+The recommended way to run code inside a built environment is the
 :php:`execute()` method. It backs up the current environment, bootstraps the
 environment described by the :php:`StateBuildContext`, runs the given closure
 and restores the previous environment afterwards – even if the closure throws:

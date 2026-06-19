@@ -14,7 +14,7 @@ Version 1.x
 This is the initial release of the standalone extension. There are no
 migration steps required for a fresh installation.
 
-The frontend environment builder and state manager were extracted from
+The environment builder and state manager were extracted from
 ``fgtclb/academic-base``. Code that previously consumed the feature through
 the ``fgtclb/academic-base`` internal classes needs to switch to the new
 package and namespace:

@@ -68,10 +68,13 @@ for example the :php:`ServerRequestInterface`, the
 
 ..  note::
 
-    A :php:`FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound`
+    Currently only the :php:`ApplicationType::FRONTEND` application type is
+    implemented, provided by the :php:`FrontendEnvironmentBuilder`. Support for
+    :php:`ApplicationType::BACKEND` is planned to be added later; until then a
+    :php:`\RuntimeException` is thrown for it. A
+    :php:`FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound`
     exception is thrown when no builder is available for the current TYPO3 core
-    version. For an unsupported application type a :php:`\RuntimeException` is
-    thrown.
+    version.
 
 In most cases you do not interact with the builder directly but use the
 :ref:`state manager <developer-state-manager>`, which uses the factory

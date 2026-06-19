@@ -30,11 +30,17 @@ Environment State Manager
 
 ----
 
-TYPO3 CMS extension providing a frontend environment builder and a state
-manager. It builds and applies a fully featured TYPO3 frontend environment
-(request, frontend controller context, TypoScript, language and visibility
-aspects, …) for a given page and safely backs up and restores the global
-state around such an operation.
+TYPO3 CMS extension providing an environment builder and a state manager. It
+builds and applies a fully featured TYPO3 environment (request, controller
+context, TypoScript, language and visibility aspects, …) for a given page and
+safely backs up and restores the global state around such an operation.
+
+..  note::
+
+    Currently only **frontend** environment handling is implemented.
+    **Backend** environment handling is planned to be added later. The API is
+    built around an :php:`ApplicationType`, so backend support can be added
+    without breaking the public interfaces.
 
 This functionality was extracted from ``fgtclb/academic-base`` into a
 dedicated, reusable extension.

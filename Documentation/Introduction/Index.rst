@@ -10,7 +10,7 @@ What does it do?
 ================
 
 The :guilabel:`Environment State Manager` extension provides a programmatic
-way to build, apply and restore a TYPO3 frontend environment.
+way to build, apply and restore a TYPO3 environment.
 
 It is useful whenever code that usually runs in a frontend request context has
 to be executed in a different context – for example in a backend module, a
@@ -18,13 +18,20 @@ command line task or a middleware – where a fully initialized frontend
 environment (request, frontend controller, TypoScript, language and visibility
 aspects) is not available.
 
+..  note::
+
+    Currently only **frontend** environment handling is implemented.
+    **Backend** environment handling is planned to be added later. The API is
+    built around an :php:`ApplicationType`, so backend support can be added
+    without breaking the public interfaces.
+
 Features
 ========
 
 *   :php:`EnvironmentBuilderFactory` returning a TYPO3 core version compatible
-    :php:`FrontendEnvironmentBuilder` for TYPO3 v12 and v13.
-*   :php:`StateManager` to apply and restore a built frontend environment
-    state.
+    environment builder for TYPO3 v12 and v13. A :php:`FrontendEnvironmentBuilder`
+    is shipped today; a backend environment builder is planned.
+*   :php:`StateManager` to build, apply and restore an environment state.
 *   :php:`StateApplyEvent` and :php:`StateBackupEvent` PSR-14 events dispatched
     around applying and backing up the state.
 
