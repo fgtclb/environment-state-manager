@@ -23,10 +23,9 @@ controller context, `ServerRequest`, TypoScript, language and visibility
 aspects, …) for a given page and to safely back up and restore the global
 state around such an operation.
 
-> **Note:** Currently only **frontend** environment handling is implemented.
-> **Backend** environment handling is planned to be added later. The API is
-> designed around an application type, so backend support can be added without
-> breaking the public interfaces.
+> **Note:** Both **frontend** and **backend** environment handling are
+> implemented. The API is designed around an application type, selecting the
+> matching environment builder for the requested type.
 
 This functionality was extracted from `fgtclb/academic-base` into a dedicated,
 reusable extension.
@@ -44,8 +43,8 @@ and also within functional tests to properly build the more global state.
 ## Features
 
 * `EnvironmentBuilderFactory` returning a TYPO3 core version compatible
-  environment builder (TYPO3 v12 and v13). A `FrontendEnvironmentBuilder` is
-  shipped today; a backend environment builder is planned.
+  environment builder (TYPO3 v12 and v13). A `FrontendEnvironmentBuilder` and a
+  `BackendEnvironmentBuilder` are shipped.
 * `StateManager` to build, apply and restore an environment state, emitting
   `StateApplyEvent` and `StateBackupEvent` PSR-14 events.
 

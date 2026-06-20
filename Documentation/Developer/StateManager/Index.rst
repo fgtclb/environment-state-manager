@@ -12,9 +12,11 @@ global TYPO3 state and is able to back up and restore that state.
 
 ..  note::
 
-    Currently only **frontend** environments are bootstrapped (the examples
-    below use :php:`ApplicationType::FRONTEND`). **Backend** environment
-    handling is planned to be added later.
+    Both frontend and backend environments are bootstrapped, selected through
+    the :php:`ApplicationType` of the :php:`StateBuildContext`. The examples
+    below use :php:`ApplicationType::FRONTEND`; see the
+    :ref:`environment builder <developer-environment-builder>` for a backend
+    example.
 
 The state manager is registered as a public service and resolved to a TYPO3
 core version compatible implementation. Inject it through dependency injection:

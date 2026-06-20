@@ -30,9 +30,11 @@ The following types form the public API. Depend on these interfaces and types:
     *   -   :php:`FGTCLB\EnvironmentStateManager\EnvironmentBuilderInterface`
         -   Builds a :php:`StateInterface` for a given build context.
     *   -   :php:`FGTCLB\EnvironmentStateManager\StateInterface`
-        -   Immutable snapshot of the bootstrapped environment elements.
+        -   Immutable snapshot of the bootstrapped environment elements (request,
+            context, backend user, language service, ...).
     *   -   :php:`FGTCLB\EnvironmentStateManager\StateBuildContext`
-        -   DTO describing which environment to build.
+        -   DTO describing which environment to build (application type, page and
+            language; backend user and workspace for backend environments).
     *   -   :php:`FGTCLB\EnvironmentStateManager\Event\StateApplyEvent`,
             :php:`FGTCLB\EnvironmentStateManager\Event\StateBackupEvent`
         -   PSR-14 events to react on state changes.
