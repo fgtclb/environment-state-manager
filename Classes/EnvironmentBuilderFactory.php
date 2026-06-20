@@ -20,6 +20,7 @@ final class EnvironmentBuilderFactory implements EnvironmentBuilderFactoryInterf
 {
     public function __construct(
         private readonly EnvironmentBuilderInterface $frontendEnvironmentBuilder,
+        private readonly EnvironmentBuilderInterface $backendEnvironmentBuilder,
     ) {}
 
     /**
@@ -29,19 +30,8 @@ final class EnvironmentBuilderFactory implements EnvironmentBuilderFactoryInterf
     {
         return match ($stateBuildContext->applicationType) {
             ApplicationType::FRONTEND => $this->frontendEnvironmentBuilder,
-            ApplicationType::BACKEND => $this->notImplemented($stateBuildContext),
+            ApplicationType::BACKEND => $this->backendEnvironmentBuilder,
             // ApplicationType has only two cases, so no default branch is needed. Omitting it keeps PHPStan happy.
         };
-    }
-
-    private function notImplemented(StateBuildContext $stateBuildContext): EnvironmentBuilderInterface
-    {
-        throw new \RuntimeException(
-            sprintf(
-                'Not implemented yet for applicationType "%s".',
-                $stateBuildContext->applicationType->value,
-            ),
-            1762256802,
-        );
     }
 }

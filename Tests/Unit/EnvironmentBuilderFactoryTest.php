@@ -17,20 +17,21 @@ final class EnvironmentBuilderFactoryTest extends UnitTestCase
     public function createReturnsConfiguredFrontendEnvironmentBuilderForFrontendContext(): void
     {
         $frontendEnvironmentBuilder = $this->createMock(EnvironmentBuilderInterface::class);
-        $factory = new EnvironmentBuilderFactory($frontendEnvironmentBuilder);
+        $backendEnvironmentBuilder = $this->createMock(EnvironmentBuilderInterface::class);
+        $factory = new EnvironmentBuilderFactory($frontendEnvironmentBuilder, $backendEnvironmentBuilder);
         $stateBuildContext = new StateBuildContext(ApplicationType::FRONTEND);
 
         $this->assertSame($frontendEnvironmentBuilder, $factory->create($stateBuildContext));
     }
 
     #[Test]
-    public function createThrowsExceptionForBackendContext(): void
+    public function createReturnsConfiguredBackendEnvironmentBuilderForBackendContext(): void
     {
-        $factory = new EnvironmentBuilderFactory($this->createMock(EnvironmentBuilderInterface::class));
+        $frontendEnvironmentBuilder = $this->createMock(EnvironmentBuilderInterface::class);
+        $backendEnvironmentBuilder = $this->createMock(EnvironmentBuilderInterface::class);
+        $factory = new EnvironmentBuilderFactory($frontendEnvironmentBuilder, $backendEnvironmentBuilder);
+        $stateBuildContext = new StateBuildContext(ApplicationType::BACKEND);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1762256802);
-
-        $factory->create(new StateBuildContext(ApplicationType::BACKEND));
+        $this->assertSame($backendEnvironmentBuilder, $factory->create($stateBuildContext));
     }
 }
