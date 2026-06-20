@@ -20,17 +20,16 @@ aspects) is not available.
 
 ..  note::
 
-    Currently only **frontend** environment handling is implemented.
-    **Backend** environment handling is planned to be added later. The API is
-    built around an :php:`ApplicationType`, so backend support can be added
-    without breaking the public interfaces.
+    Both **frontend** and **backend** environment handling are implemented.
+    The API is built around an :php:`ApplicationType`, selecting the matching
+    environment builder for the requested type.
 
 Features
 ========
 
 *   :php:`EnvironmentBuilderFactory` returning a TYPO3 core version compatible
     environment builder for TYPO3 v12 and v13. A :php:`FrontendEnvironmentBuilder`
-    is shipped today; a backend environment builder is planned.
+    and a :php:`BackendEnvironmentBuilder` are shipped.
 *   :php:`StateManager` to build, apply and restore an environment state.
 *   :php:`StateApplyEvent` and :php:`StateBackupEvent` PSR-14 events dispatched
     around applying and backing up the state.

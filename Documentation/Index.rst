@@ -37,10 +37,9 @@ safely backs up and restores the global state around such an operation.
 
 ..  note::
 
-    Currently only **frontend** environment handling is implemented.
-    **Backend** environment handling is planned to be added later. The API is
-    built around an :php:`ApplicationType`, so backend support can be added
-    without breaking the public interfaces.
+    Both **frontend** and **backend** environment handling are implemented.
+    The API is built around an :php:`ApplicationType`, selecting the matching
+    environment builder for the requested type.
 
 This functionality was extracted from ``fgtclb/academic-base`` into a
 dedicated, reusable extension.

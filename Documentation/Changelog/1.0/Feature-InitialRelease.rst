@@ -17,7 +17,8 @@ The extension provides:
 
 *   :php:`EnvironmentBuilderFactory` returning a TYPO3 core version compatible
     environment builder for TYPO3 v12 and v13. A :php:`FrontendEnvironmentBuilder`
-    is shipped; backend environment handling is planned to be added later.
+    and a :php:`BackendEnvironmentBuilder` are shipped (see
+    :ref:`feature-backend-environment-builder`).
 *   :php:`StateManager` to bootstrap, apply, back up and restore an environment
     state.
 *   :php:`StateApplyEvent` and :php:`StateBackupEvent` PSR-14 events.

@@ -74,15 +74,41 @@ for example the :php:`ServerRequestInterface`, the
     container resolves the implementation for the running TYPO3 core version. See
     :ref:`developer-public-api` for the full public API surface.
 
-..  note::
+Both the :php:`ApplicationType::FRONTEND` and :php:`ApplicationType::BACKEND`
+application types are implemented, provided by the
+:php:`FrontendEnvironmentBuilder` and the :php:`BackendEnvironmentBuilder`
+respectively. A
+:php:`FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound`
+exception is thrown when no builder is available for the current TYPO3 core
+version.
 
-    Currently only the :php:`ApplicationType::FRONTEND` application type is
-    implemented, provided by the :php:`FrontendEnvironmentBuilder`. Support for
-    :php:`ApplicationType::BACKEND` is planned to be added later; until then a
-    :php:`\RuntimeException` is thrown for it. A
-    :php:`FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound`
-    exception is thrown when no builder is available for the current TYPO3 core
-    version.
+Building a backend environment
+==============================
+
+For :php:`ApplicationType::BACKEND` the build context additionally accepts the
+backend user and the workspace to operate in. The builder assembles a backend
+request, a backend user, a language service and a context with the
+``backend.user`` and ``workspace`` aspects for the selected page:
+
+..  code-block:: php
+
+    use FGTCLB\EnvironmentStateManager\StateBuildContext;
+    use TYPO3\CMS\Core\Http\ApplicationType;
+
+    $stateBuildContext = new StateBuildContext(
+        applicationType: ApplicationType::BACKEND,
+        pageId: 42,
+        // Optional: the backend user to load. Defaults to a synthetic in-memory
+        // admin that needs no `be_users` record.
+        backendUserId: null,
+        // Optional: the workspace to operate in. Defaults to the live workspace.
+        workspaceId: null,
+    );
+
+    $this->stateManager->execute($stateBuildContext, function () {
+        // Code in here runs within the backend environment built for page 42,
+        // e.g. BackendUtility::getPagesTSconfig(42) resolves the page TSconfig.
+    });
 
 In most cases you do not interact with the builder directly but use the
 :ref:`state manager <developer-state-manager>`, which uses the factory
