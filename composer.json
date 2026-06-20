@@ -39,7 +39,11 @@
         },
         "bin-dir": ".Build/bin",
         "sort-packages": true,
-        "vendor-dir": ".Build/vendor"
+        "vendor-dir": ".Build/vendor",
+        "audit": {
+            "block-insecure": false,
+            "block-abandoned": false
+        }
     },
     "autoload": {
         "psr-4": {
