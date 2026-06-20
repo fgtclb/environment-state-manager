@@ -77,6 +77,11 @@ and also within functional tests to properly build the more global state.
         Technical description and code examples for the environment builder
         and the state manager.
 
+    ..  card:: :ref:`Contribution <contribution>`
+
+        Set up a development environment, run the tests and follow the commit
+        message rules.
+
     ..  card:: :ref:`Changelog <changelog>`
 
         Overview of the changes per released version.
@@ -89,4 +94,5 @@ and also within functional tests to properly build the more global state.
     Introduction/Index
     Administration/Index
     Developer/Index
+    Contribution/Index
     Changelog/Index
