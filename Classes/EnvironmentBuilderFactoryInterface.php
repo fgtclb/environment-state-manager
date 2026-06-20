@@ -9,7 +9,8 @@ use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironment
 /**
  * Interface for environment builder factory implementations.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * This interface is part of the public API. Type-hint it to retrieve a TYPO3 core-version
+ * compatible environment builder for a given build context.
  */
 interface EnvironmentBuilderFactoryInterface
 {

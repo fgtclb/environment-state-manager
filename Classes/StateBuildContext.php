@@ -10,7 +10,8 @@ use TYPO3\CMS\Core\Http\ApplicationType;
  * DTO carrying the build context configuration that defines how the
  * environment should be bootstrapped and prepared.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * This DTO is part of the public API and is instantiated directly by consumers to describe the
+ * environment to build.
  */
 final class StateBuildContext
 {
