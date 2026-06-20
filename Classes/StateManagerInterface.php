@@ -7,14 +7,14 @@ namespace FGTCLB\EnvironmentStateManager;
 use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound;
 
 /**
- * Describes the mandatory methods of a environment state manager implementation.
+ * Describes the methods an environment state manager implementation must provide.
  *
- * @internal only to be used within `EXT:environment_state_manager` and depending extensions and not part of public API.
+ * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
  */
 interface StateManagerInterface
 {
     /**
-     * Create a backup of the current environment and add it on top of the snapshot stack.
+     * Creates a backup of the current environment and pushes it onto the snapshot stack.
      */
     public function backup(): void;
 
@@ -26,17 +26,17 @@ interface StateManagerInterface
     /**
      * Reset the environment to an empty state.
      *
-     * **Be aware** that this method does not make a backup nor restores the current environment.
+     * **Be aware** that this method neither backs up nor restores the current environment.
      */
     public function reset(): void;
 
     /**
-     * Create a state for `$pageId` and populate the environment with it,
-     * returning the created state elements as {@see StateInterface}.
+     * Creates a state for `$pageId` and populates the environment with it,
+     * returning the created state as {@see StateInterface}.
      *
-     * **Be aware** that this method changes the environment without doing and backup
-     * of it nor restores it if {@see StateBuildContext::$autoApplyBootstrappedEnvironment}
-     * is set to true. For snapshot handling see following methods:
+     * **Be aware** that this method changes the environment without creating a backup
+     * of it or restoring it when {@see StateBuildContext::$autoApplyBootstrappedEnvironment}
+     * is set to true. For snapshot handling, see the following methods:
      *
      * - {@see StateManagerInterface::backup()}
      * - {@see StateManagerInterface::restore()}
@@ -46,25 +46,25 @@ interface StateManagerInterface
     public function bootstrap(StateBuildContext $stateBuildContext): StateInterface;
 
     /**
-     * Apply provided state to the environment.
+     * Applies the given state to the environment.
      *
-     * **Be aware** that this method changes the environment without doing and backup
-     * of it nor restores it. See {@see StateManagerInterface::backup()} and method
+     * **Be aware** that this method changes the environment without creating a backup
+     * of it or restoring it. See {@see StateManagerInterface::backup()} and
      * {@see StateManagerInterface::restore()} for snapshot handling.
      */
     public function apply(StateInterface $state): void;
 
     /**
-     * Execute code ($work closure) in the environment defined by $stateBuildContext,
-     * which includes following steps:
+     * Executes code (the $work closure) in the environment defined by $stateBuildContext.
+     * This involves the following steps:
      *
-     * - backup current environment state
-     * - bootstrap environment state described by $stateBuildContext
-     * - execute $work closure
-     * - restore environment state snapshot
+     * - back up the current environment state
+     * - bootstrap the environment state described by $stateBuildContext
+     * - execute the $work closure
+     * - restore the environment state snapshot
      *
-     * The implementation **must** ensure that environment restore is executed in any case, even if
-     * $work closure execution throws any error or exception, for example using `try {} finally {}.`
+     * The implementation **must** make sure the environment is restored in every case, even when the
+     * $work closure throws an error or exception — for example by using `try {} finally {}`.
      */
     public function execute(StateBuildContext $stateBuildContext, \Closure $work): void;
 }

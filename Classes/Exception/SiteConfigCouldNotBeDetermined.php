@@ -7,7 +7,7 @@ namespace FGTCLB\EnvironmentStateManager\Exception;
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderInterface;
 
 /**
- * This exception indicates that no suiting SiteConfiguration could be automatically determined.
+ * This exception indicates that no suitable SiteConfiguration could be determined automatically.
  *
  * Thrown in {@see EnvironmentBuilderInterface::build()} implementations.
  */

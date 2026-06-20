@@ -7,10 +7,10 @@ namespace FGTCLB\EnvironmentStateManager;
 use TYPO3\CMS\Core\Http\ApplicationType;
 
 /**
- * Environment build context configuration DTO used to configure
- * how the environment should be bootstrapped and prepared.
+ * DTO carrying the build context configuration that defines how the
+ * environment should be bootstrapped and prepared.
  *
- * @internal only to be used within `EXT:environment_state_manager` and depending extensions and not part of public API.
+ * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
  */
 final class StateBuildContext
 {

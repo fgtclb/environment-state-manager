@@ -11,10 +11,10 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
- * Interface defining the shared methods across supported TYPO3 version,
- * used to implement version specific implementations.
+ * Interface defining the methods shared across all supported TYPO3 versions,
+ * serving as the base for the version-specific implementations.
  *
- * @internal only to be used within `EXT:environment_state_manager` and depending extensions and not part of public API.
+ * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
  */
 interface StateInterface
 {

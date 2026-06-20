@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace FGTCLB\EnvironmentStateManager;
 
 /**
- * Provides shared {@see StateManagerInterface::execute()} implementation to be used in
- * {@see StateManagerInterface} implementations depending on to reduce code duplication.
+ * Provides a shared {@see StateManagerInterface::execute()} implementation that
+ * {@see StateManagerInterface} implementations can rely on to reduce code duplication.
  *
- * @internal only to be used within `EXT:environment_state_manager` and depending extensions and not part of public API.
+ * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
  */
 trait StateManagerExecuteMethodTrait
 {
     /**
-     * Execute code ($work closure) in the environment defined by $stateBuildContext,
-     * which includes following steps:
+     * Executes code (the $work closure) in the environment defined by $stateBuildContext.
+     * This involves the following steps:
      *
-     * - backup current environment state
-     * - bootstrap environment state described by $stateBuildContext
-     * - execute $work closure
-     * - restore environment state snapshot
+     * - back up the current environment state
+     * - bootstrap the environment state described by $stateBuildContext
+     * - execute the $work closure
+     * - restore the environment state snapshot
      *
-     * The implementation **must** ensure that environment restore is executed in any case, even if
-     * $work closure execution throws any error or exception, for example using `try {} finally {}.`
+     * The implementation **must** make sure the environment is restored in every case, even when the
+     * $work closure throws an error or exception — for example by using `try {} finally {}`.
      */
     public function execute(StateBuildContext $stateBuildContext, \Closure $work): void
     {
@@ -38,15 +38,15 @@ trait StateManagerExecuteMethodTrait
             );
         }
 
-        // Create current environment state snapshot.
+        // Create a snapshot of the current environment state.
         $this->backup();
         try {
-            // Bootstrap environment based on state build context.
+            // Bootstrap the environment based on the state build context.
             $this->bootstrap($stateBuildContext);
-            // Execute closure.
+            // Execute the closure.
             $work();
         } finally {
-            // Ensure to restore previous environment state.
+            // Make sure the previous environment state is restored.
             $this->restore();
         }
     }

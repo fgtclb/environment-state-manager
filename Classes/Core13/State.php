@@ -13,16 +13,16 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
- * Provides a single environment snapshot populated by the current environment or used to create a new one.
- * Only for TYPO3 v13.
+ * Holds a single environment snapshot, either populated from the current environment or used to
+ * create a new one. TYPO3 v13 only.
  *
- * Note that `#[Exclude]` is used intentionally to avoid automatic early compiling into the
- * dependency injection container leading to missing class and other issues for not related
- * TYPO3 version. TYPO3 version aware configuration is handled and re_enabled within the
- * `EXT:environment_state_manager/Configuration/Services.php` file. This class is a DTO and should be
- * excluded always anyway.
+ * The `#[Exclude]` attribute is set on purpose. It keeps this class from being compiled
+ * early into the dependency injection container, which would otherwise trigger missing-class
+ * and similar errors for unrelated TYPO3 versions. The TYPO3 version-aware configuration is
+ * handled and re-enabled in the `EXT:environment_state_manager/Configuration/Services.php` file.
+ * Since this class is a DTO, it should always be excluded anyway.
  *
- * @internal only to be used within `EXT:environment_state_manager` and depending extensions and not part of public API.
+ * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
  */
 #[Exclude]
 final class State implements StateInterface, ExtendedStateInterface

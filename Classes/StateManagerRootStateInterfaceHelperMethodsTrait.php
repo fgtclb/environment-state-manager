@@ -19,10 +19,10 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
- * This trait provides internal methods for {@see StateInterface} provided getter methods to use them
- * in {@see StateManagerInterface} implementation for the base interface and reduce code duplication.
+ * This trait provides internal helper methods built around the {@see StateInterface} getters, so
+ * {@see StateManagerInterface} implementations can reuse them for the base interface and avoid code duplication.
  *
- * @internal only to be used within `EXT:environment_state_manager` and depending extensions and not part of public API.
+ * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
  */
 trait StateManagerRootStateInterfaceHelperMethodsTrait
 {
@@ -58,7 +58,7 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
             }
         }
         $this->overrideContextData(
-            // Operate on real singleton instance.
+            // Operate on the real singleton instance.
             GeneralUtility::makeInstance(Context::class),
             $contextToSet,
         );
@@ -71,9 +71,9 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         $contentObjectRenderer = null;
         if ($state->typoScriptFrontendController() !== null) {
             $GLOBALS['TSFE'] = $state->typoScriptFrontendController();
-            // New ServerRequest request is only applied to keep PHPStan for multiple core versions
-            // happy, request should always exists in case a TypoScriptFrontendController exists in
-            // state snapshot.
+            // A fresh ServerRequest is only passed here to keep PHPStan happy across multiple core
+            // versions; a request should always exist when the state snapshot contains a
+            // TypoScriptFrontendController.
             $GLOBALS['TSFE']->newCObj($state->request() ?? new ServerRequest());
             $contentObjectRenderer = $GLOBALS['TSFE']->cObj;
         } else {
@@ -84,31 +84,31 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         } else {
             unset($GLOBALS['BE_USER']);
         }
-        // apply super globals
+        // Apply the super globals.
         $superGlobals = $state->additionalData('_SERVER');
         foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
             if (!is_array($superGlobals)) {
                 if (!is_array($_SERVER)) {
-                    // No superglobals wanted for environment and super global does not exist, simply skip it.
+                    // No super globals wanted for the environment and the super global does not exist, so skip it.
                     continue;
                 }
-                // No superglobals wanted for environment but super global exists, ensure to remove not set variable.
+                // No super globals wanted for the environment but the super global exists, so remove the unset variable.
                 unset($_SERVER[$var]);
                 continue;
             }
             if (array_key_exists($var, $superGlobals)) {
-                // Wanted for environment, apply it to $_SERVER.
+                // Required for the environment, so apply it to $_SERVER.
                 $_SERVER[$var] = $superGlobals[$var];
                 continue;
             }
-            // not set in for environment, remove it from $_SERVER.
+            // Not part of the environment, so remove it from $_SERVER.
             unset($_SERVER[$var]);
         }
-        // This is required to ensure that the IndpEnv cache is cleared properly to ensure
-        // that extension or core calls to `GeneralUtility::getIndpEnv()` retrieves values
-        // based on the applied/prepared environment. Ignoring `@internal` is done intentionally.
+        // This is needed so the IndpEnv cache is flushed properly, ensuring that extension or
+        // core calls to `GeneralUtility::getIndpEnv()` return values based on the prepared
+        // environment. Ignoring `@internal` here is intentional.
         GeneralUtility::flushInternalRuntimeCaches();
-        // Restore safed PageRender or clean it up at least.
+        // Restore the saved PageRenderer, or at least clean it up.
         $instances = GeneralUtility::getSingletonInstances();
         unset($instances[PageRenderer::class]);
         GeneralUtility::resetSingletonInstances($instances);

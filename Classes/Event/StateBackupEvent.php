@@ -7,12 +7,12 @@ namespace FGTCLB\EnvironmentStateManager\Event;
 use FGTCLB\EnvironmentStateManager\StateInterface;
 
 /**
- * This event is dispatched in {@see StateManagerRootStateInterfaceHelperMethodsTrait::dispatchStateBackupEvent()},
- * used by TYPO3 version related implementation to allow backup custom state data using generic additiona state
- * provided with {@see StateInterface::additionalData()}, {@see StateInterface::completeAdditionalData()} and
- * {@see StateInterface::withAdditionalData()}.
+ * This event is dispatched in {@see StateManagerRootStateInterfaceHelperMethodsTrait::dispatchStateBackupEvent()}.
+ * TYPO3 version-specific implementations can use it to back up custom state data through the generic
+ * additional state exposed by {@see StateInterface::additionalData()}, {@see StateInterface::completeAdditionalData()}
+ * and {@see StateInterface::withAdditionalData()}.
  *
- * @internal for internal usage only and not part of public API.
+ * @internal for internal use only; not part of the public API.
  */
 final class StateBackupEvent
 {

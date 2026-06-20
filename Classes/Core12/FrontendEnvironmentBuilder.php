@@ -30,14 +30,14 @@ use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
- * Environment builder compatible with TYPO3 v12.
+ * Environment builder for TYPO3 v12.
  *
- * Note that `#[Exclude]` is used intentionally to avoid automatic early compiling into the
- * dependency injection container leading to missing class and other issues for not related
- * TYPO3 version. TYPO3 version aware configuration is handled and re_enabled within the
- * `EXT:environment_state_manager/Configuration/Services.php` file.
+ * The `#[Exclude]` attribute is set on purpose. It keeps this class from being compiled
+ * early into the dependency injection container, which would otherwise trigger missing-class
+ * and similar errors for unrelated TYPO3 versions. The TYPO3 version-aware configuration is
+ * handled and re-enabled in the `EXT:environment_state_manager/Configuration/Services.php` file.
  *
- * @internal only to be used within `EXT:environment_state_manager` and depending extensions and not part of public API.
+ * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
  */
 #[Exclude]
 final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
@@ -58,7 +58,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     ) {}
 
     /**
-     * Build environment configured by passed $buildContext.
+     * Builds the environment as configured by the given build context.
      */
     public function build(StateBuildContext $stateBuildContext): StateInterface
     {
@@ -90,16 +90,16 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         ];
         foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
             if (array_key_exists($var, $serverParams)) {
-                // Wanted for environment, apply it to $_SERVER.
+                // Required for the environment, so apply it to $_SERVER.
                 $_SERVER[$var] = $serverParams[$var];
                 continue;
             }
-            // not set in for environment, remove it from $_SERVER.
+            // Not part of the environment, so remove it from $_SERVER.
             unset($_SERVER[$var]);
         }
-        // This is required to ensure that the IndpEnv cache is cleared properly to ensure
-        // that extension or core calls to `GeneralUtility::getIndpEnv()` retrieves values
-        // based on the applied/prepared environment. Ignoring `@internal` is done intentionally.
+        // This is needed so the IndpEnv cache is flushed properly, ensuring that extension or
+        // core calls to `GeneralUtility::getIndpEnv()` return values based on the prepared
+        // environment. Ignoring `@internal` here is intentional.
         GeneralUtility::flushInternalRuntimeCaches();
         $request = (new ServerRequest(
             $uri,
@@ -121,21 +121,21 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     private function createTypoScriptFrontendController(StateBuildContext $stateBuildContext, State $state, Site $site, SiteLanguage $siteLanguage): State
     {
         $request = $state->request() ?? new ServerRequest();
-        // Note creating with new here on purpose to have a clean new instance.
+        // Intentionally instantiated with `new` here to get a clean, fresh instance.
         $context = new Context();
         $context->setAspect('language', LanguageAspectFactory::createFromSiteLanguage($siteLanguage));
         $pageId = $this->getNearestAccessiblePage($stateBuildContext->pageId ?? $site->getRootPageId(), $context)
             ?: $site->getRootPageId();
-        // Ensure frontend user authentication in request
-        // @todo Consider if frontend user authentication data may be set through StateBuildContext.
+        // Make sure frontend user authentication is present in the request.
+        // @todo Consider whether frontend user authentication data could be provided through StateBuildContext.
         $frontendUser = GeneralUtility::makeInstance(FrontendUserAuthentication::class);
         $frontendUser->start($request);
         $this->unpackFrontendUserConfiguration($frontendUser);
         $request = $request->withAttribute('frontend.user', $frontendUser);
-        // Ensure template parsing by setting TypoScriptAspect::$forcedTemplateParsing (required for TypoScript setup initialization)
+        // Force template parsing via TypoScriptAspect::$forcedTemplateParsing (required to initialize the TypoScript setup).
         $typoScriptAspect = GeneralUtility::makeInstance(TypoScriptAspect::class, true);
         $context->setAspect('typoscript', $typoScriptAspect);
-        // Bootstrap TypoScriptFrontendController
+        // Bootstrap the TypoScriptFrontendController.
         $controller = GeneralUtility::makeInstance(
             TypoScriptFrontendController::class,
             $context,
@@ -202,8 +202,8 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     }
 
     /**
-     * Determine the SiteLanguage to use based on the state build context, if available. Otherwise default language
-     * is returned as language to use.
+     * Determines the SiteLanguage to use from the given build context. Falls back to the site's
+     * default language when no language is configured.
      */
     private function determineSiteLanguage(StateBuildContext $buildContext, Site $site): SiteLanguage
     {
@@ -214,7 +214,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     }
 
     /**
-     * Helper method to unpack the serialized frontend user configuration.
+     * Unpacks the serialized frontend user configuration.
      */
     private function unpackFrontendUserConfiguration(FrontendUserAuthentication $frontendUserAuthentication): void
     {

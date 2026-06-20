@@ -11,7 +11,7 @@ use TYPO3\CMS\Core\Http\ApplicationType;
 /**
  * Default environment builder factory implementation for {@see EnvironmentBuilderFactoryInterface}.
  *
- * @internal only to be used within `EXT:environment_state_manager` and depending extensions and not part of public API.
+ * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
  */
 #[Exclude]
 final class EnvironmentBuilderFactory implements EnvironmentBuilderFactoryInterface
@@ -28,7 +28,7 @@ final class EnvironmentBuilderFactory implements EnvironmentBuilderFactoryInterf
         return match ($stateBuildContext->applicationType) {
             ApplicationType::FRONTEND => $this->frontendEnvironmentBuilder,
             ApplicationType::BACKEND => $this->notImplemented($stateBuildContext),
-            // ApplicationType only has 2 cases, so no default branch is required. Omitting it makes PHPStan happy.
+            // ApplicationType has only two cases, so no default branch is needed. Omitting it keeps PHPStan happy.
         };
     }
 
