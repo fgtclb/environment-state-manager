@@ -138,13 +138,12 @@ Tags
     *   -   ``[FEATURE]``
         -   A new feature or capability.
     *   -   ``[TASK]``
-        -   Maintenance, refactoring, tooling and other non-functional changes.
+        -   Maintenance, refactoring, tooling, tests and other non-functional
+            changes.
     *   -   ``[BUGFIX]``
         -   A bug fix.
     *   -   ``[DOCS]``
         -   Documentation-only changes.
-    *   -   ``[TEST]``
-        -   Changes to tests only.
 
 Breaking changes are additionally prefixed with ``[!!!]`` in front of the tag,
 so reviewers and users can spot them immediately:

@@ -64,8 +64,9 @@ and, more importantly, why it is needed.
 - An issue reference is **not required** (optionally `Resolves: #123` in the
   body).
 
-Tags: `[FEATURE]`, `[TASK]`, `[BUGFIX]`, `[DOCS]`, `[TEST]`. Breaking changes
-are additionally prefixed with `[!!!]` (for example `[!!!][TASK] …`).
+Tags: `[FEATURE]`, `[TASK]`, `[BUGFIX]`, `[DOCS]` (test-only changes use
+`[TASK]`). Breaking changes are additionally prefixed with `[!!!]` (for example
+`[!!!][TASK] …`).
 
 See [`Documentation/Contribution/Index.rst`](Documentation/Contribution/Index.rst)
 for the full details.
