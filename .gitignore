@@ -16,3 +16,6 @@
 
 /tailor-version-artefact/
 /tailor-version-upload/
+
+# Local agent task tracking (not part of the extension)
+/.claude/
