@@ -7,6 +7,7 @@ namespace FGTCLB\EnvironmentStateManager;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -27,6 +28,8 @@ interface StateInterface
     public function pageRenderer(): ?PageRenderer;
     public function withBackendUserAuthentication(?BackendUserAuthentication $backendUserAuthentication = null): self;
     public function backendUserAuthentication(): ?BackendUserAuthentication;
+    public function withLanguageService(?LanguageService $languageService = null): self;
+    public function languageService(): ?LanguageService;
     public function withContext(?Context $context): self;
     public function context(): ?Context;
 
