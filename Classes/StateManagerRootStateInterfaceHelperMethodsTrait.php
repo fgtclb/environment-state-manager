@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -84,6 +85,11 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         } else {
             unset($GLOBALS['BE_USER']);
         }
+        if ($state->languageService() !== null) {
+            $GLOBALS['LANG'] = $state->languageService();
+        } else {
+            unset($GLOBALS['LANG']);
+        }
         // Apply the super globals.
         $superGlobals = $state->additionalData('_SERVER');
         foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
@@ -146,11 +152,14 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
                 }
             }
         }
+        /** @var LanguageService|null $languageService */
+        $languageService = $GLOBALS['LANG'] ?? null;
         return $state
             ->withContext($context)
             ->withRequest($request)
             ->withTypoScriptFrontendController($typoScriptFrontendController)
             ->withBackendUserAuthentication($GLOBALS['BE_USER'] ?? null)
+            ->withLanguageService($languageService)
             ->withPageRenderer($pageRenderer)
             ->withAdditionalData('_SERVER', $superGlobals);
     }

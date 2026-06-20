@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -39,6 +40,7 @@ final class State implements StateInterface, ExtendedStateInterface
         private readonly ?PageRenderer $pageRenderer = null,
         private readonly ?Context $context = null,
         private readonly ?BackendUserAuthentication $backendUserAuthentication = null,
+        private readonly ?LanguageService $languageService = null,
         private readonly array $additionalData = [],
     ) {}
 
@@ -67,6 +69,11 @@ final class State implements StateInterface, ExtendedStateInterface
         return $this->backendUserAuthentication;
     }
 
+    public function languageService(): ?LanguageService
+    {
+        return $this->languageService;
+    }
+
     /**
      * @return array<int|string, mixed>|null Returns null in case $key does not exist, otherwise the data array.
      */
@@ -93,6 +100,7 @@ final class State implements StateInterface, ExtendedStateInterface
             pageRenderer: $this->pageRenderer,
             context: $context,
             backendUserAuthentication: $this->backendUserAuthentication,
+            languageService: $this->languageService,
             additionalData: $this->additionalData,
         );
     }
@@ -105,6 +113,7 @@ final class State implements StateInterface, ExtendedStateInterface
             pageRenderer: $this->pageRenderer,
             context: $this->context,
             backendUserAuthentication: $this->backendUserAuthentication,
+            languageService: $this->languageService,
             additionalData: $this->additionalData,
         );
     }
@@ -117,6 +126,7 @@ final class State implements StateInterface, ExtendedStateInterface
             pageRenderer: $this->pageRenderer,
             context: $this->context,
             backendUserAuthentication: $this->backendUserAuthentication,
+            languageService: $this->languageService,
             additionalData: $this->additionalData,
         );
     }
@@ -129,6 +139,7 @@ final class State implements StateInterface, ExtendedStateInterface
             pageRenderer: $pageRenderer,
             context: $this->context,
             backendUserAuthentication: $this->backendUserAuthentication,
+            languageService: $this->languageService,
             additionalData: $this->additionalData,
         );
     }
@@ -141,6 +152,20 @@ final class State implements StateInterface, ExtendedStateInterface
             pageRenderer: $this->pageRenderer,
             context: $this->context,
             backendUserAuthentication: $backendUserAuthentication,
+            languageService: $this->languageService,
+            additionalData: $this->additionalData,
+        );
+    }
+
+    public function withLanguageService(?LanguageService $languageService = null): self
+    {
+        return new self(
+            request: $this->request,
+            typoScriptFrontendController: $this->typoScriptFrontendController,
+            pageRenderer: $this->pageRenderer,
+            context: $this->context,
+            backendUserAuthentication: $this->backendUserAuthentication,
+            languageService: $languageService,
             additionalData: $this->additionalData,
         );
     }
@@ -158,6 +183,7 @@ final class State implements StateInterface, ExtendedStateInterface
             pageRenderer: $this->pageRenderer,
             context: $this->context,
             backendUserAuthentication: $this->backendUserAuthentication,
+            languageService: $this->languageService,
             additionalData: $additionalData,
         );
     }
