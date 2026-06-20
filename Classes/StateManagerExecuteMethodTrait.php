@@ -8,7 +8,7 @@ namespace FGTCLB\EnvironmentStateManager;
  * Provides a shared {@see StateManagerInterface::execute()} implementation that
  * {@see StateManagerInterface} implementations can rely on to reduce code duplication.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * @internal Internal implementation detail of the shipped state managers; not part of the public API.
  */
 trait StateManagerExecuteMethodTrait
 {

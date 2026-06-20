@@ -11,7 +11,8 @@ use FGTCLB\EnvironmentStateManager\StateManagerRootStateInterfaceHelperMethodsTr
  * This event is dispatched in {@see StateManagerRootStateInterfaceHelperMethodsTrait::dispatchStateApplyEvent()}.
  * TYPO3 version-specific implementations can use it to apply additional custom state, for example.
  *
- * @internal for internal use only; not part of the public API.
+ * This event is part of the public API. Register a PSR-14 listener to react when a state is applied
+ * to the global environment.
  */
 final class StateApplyEvent
 {

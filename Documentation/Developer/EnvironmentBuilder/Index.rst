@@ -68,6 +68,14 @@ for example the :php:`ServerRequestInterface`, the
 
 ..  note::
 
+    Always type-hint the :php:`EnvironmentBuilderFactoryInterface`,
+    :php:`EnvironmentBuilderInterface` and :php:`StateInterface`, never the
+    concrete :php:`Core12\*` or :php:`Core13\*` classes. The dependency injection
+    container resolves the implementation for the running TYPO3 core version. See
+    :ref:`developer-public-api` for the full public API surface.
+
+..  note::
+
     Currently only the :php:`ApplicationType::FRONTEND` application type is
     implemented, provided by the :php:`FrontendEnvironmentBuilder`. Support for
     :php:`ApplicationType::BACKEND` is planned to be added later; until then a

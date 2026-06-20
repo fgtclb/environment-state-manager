@@ -22,7 +22,10 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * handled and re-enabled in the `EXT:environment_state_manager/Configuration/Services.php` file.
  * Since this class is a DTO, it should always be excluded anyway.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * @internal Concrete, TYPO3 v12 specific implementation of {@see StateInterface} (and
+ *           {@see ExtendedStateInterface}). Created through the environment builder and the state
+ *           manager — type-hint the interface, not this class. Not covered by the extension's
+ *           public-API backward-compatibility promise.
  */
 #[Exclude]
 final class State implements StateInterface, ExtendedStateInterface

@@ -11,7 +11,9 @@ use TYPO3\CMS\Core\Http\ApplicationType;
 /**
  * Default environment builder factory implementation for {@see EnvironmentBuilderFactoryInterface}.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * @internal Concrete implementation of {@see EnvironmentBuilderFactoryInterface}. Resolved through
+ *           dependency injection — type-hint the interface, not this class. Not covered by the
+ *           extension's public-API backward-compatibility promise.
  */
 #[Exclude]
 final class EnvironmentBuilderFactory implements EnvironmentBuilderFactoryInterface

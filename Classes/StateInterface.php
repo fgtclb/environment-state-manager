@@ -14,7 +14,8 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * Interface defining the methods shared across all supported TYPO3 versions,
  * serving as the base for the version-specific implementations.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * This interface is part of the public API and is the type you receive from the state manager and
+ * environment builder. Type-hint it instead of the concrete `Core*` state implementations.
  */
 interface StateInterface
 {

@@ -22,7 +22,7 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * This trait provides internal helper methods built around the {@see StateInterface} getters, so
  * {@see StateManagerInterface} implementations can reuse them for the base interface and avoid code duplication.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * @internal Internal implementation detail of the shipped state managers; not part of the public API.
  */
 trait StateManagerRootStateInterfaceHelperMethodsTrait
 {

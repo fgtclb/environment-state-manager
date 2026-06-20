@@ -21,7 +21,9 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  * and similar errors for unrelated TYPO3 versions. The TYPO3 version-aware configuration is
  * handled and re-enabled in the `EXT:environment_state_manager/Configuration/Services.php` file.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * @internal Concrete, TYPO3 v13 specific implementation of {@see StateManagerInterface}. Resolved
+ *           through dependency injection — type-hint the interface, not this class. Not covered by
+ *           the extension's public-API backward-compatibility promise.
  */
 #[Exclude]
 final class StateManager implements StateManagerInterface
@@ -77,8 +79,7 @@ final class StateManager implements StateManagerInterface
      * returning the created state as {@see StateInterface}.
      *
      * **Be aware** that this method changes the environment without creating a backup
-     * of it or restoring it when {@see StateBuildContext::$autoApplyBootstrappedEnvironment}
-     * is set to true. For snapshot handling, see the following methods:
+     * of it or restoring it. For snapshot handling, see the following methods:
      *
      * - {@see StateManagerInterface::backup()}
      * - {@see StateManagerInterface::restore()}

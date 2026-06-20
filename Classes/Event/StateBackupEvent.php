@@ -12,7 +12,8 @@ use FGTCLB\EnvironmentStateManager\StateInterface;
  * additional state exposed by {@see StateInterface::additionalData()}, {@see StateInterface::completeAdditionalData()}
  * and {@see StateInterface::withAdditionalData()}.
  *
- * @internal for internal use only; not part of the public API.
+ * This event is part of the public API. Register a PSR-14 listener to react when the current
+ * environment is backed up onto the snapshot stack.
  */
 final class StateBackupEvent
 {

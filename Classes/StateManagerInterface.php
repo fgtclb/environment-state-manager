@@ -9,7 +9,9 @@ use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironment
 /**
  * Describes the methods an environment state manager implementation must provide.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * This interface is part of the public API. Type-hint it to inject the state manager; the
+ * dependency injection container resolves it to the implementation matching the running TYPO3
+ * core version. Do not depend on the concrete `Core*` implementations directly.
  */
 interface StateManagerInterface
 {
@@ -35,8 +37,7 @@ interface StateManagerInterface
      * returning the created state as {@see StateInterface}.
      *
      * **Be aware** that this method changes the environment without creating a backup
-     * of it or restoring it when {@see StateBuildContext::$autoApplyBootstrappedEnvironment}
-     * is set to true. For snapshot handling, see the following methods:
+     * of it or restoring it. For snapshot handling, see the following methods:
      *
      * - {@see StateManagerInterface::backup()}
      * - {@see StateManagerInterface::restore()}

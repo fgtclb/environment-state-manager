@@ -7,7 +7,9 @@ namespace FGTCLB\EnvironmentStateManager;
 /**
  * Interface for concrete environment builder implementations.
  *
- * @internal only for use within `EXT:environment_state_manager` and dependent extensions; not part of the public API.
+ * This interface is part of the public API. The concrete builder differs between supported TYPO3
+ * core versions and is resolved through {@see EnvironmentBuilderFactoryInterface}; type-hint this
+ * interface instead of a concrete `Core*` implementation.
  */
 interface EnvironmentBuilderInterface
 {

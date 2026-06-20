@@ -30,6 +30,13 @@ core version compatible implementation. Inject it through dependency injection:
         ) {}
     }
 
+..  note::
+
+    Always type-hint :php:`StateManagerInterface`, never a concrete
+    :php:`Core12\StateManager` or :php:`Core13\StateManager`. The dependency
+    injection container resolves the implementation for the running TYPO3 core
+    version. See :ref:`developer-public-api` for the full public API surface.
+
 Execute code within an environment
 ==================================
 
