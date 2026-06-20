@@ -1,0 +1,4 @@
+"pages"
+,"uid","pid","title","doktype","slug","TSconfig"
+,1,0,"Root",1,"/","TCEMAIN.test = 123"
+,2,1,"Sub",1,"/sub","TCEMAIN.sub = 456"

@@ -16,11 +16,11 @@ final class StateBuildContextTest extends UnitTestCase
     {
         $context = new StateBuildContext(ApplicationType::FRONTEND);
 
-        self::assertSame(ApplicationType::FRONTEND, $context->applicationType);
-        self::assertNull($context->pageId);
-        self::assertNull($context->languageId);
-        self::assertNull($context->backendUserId);
-        self::assertNull($context->workspaceId);
+        $this->assertSame(ApplicationType::FRONTEND, $context->applicationType);
+        $this->assertNull($context->pageId);
+        $this->assertNull($context->languageId);
+        $this->assertNull($context->backendUserId);
+        $this->assertNull($context->workspaceId);
     }
 
     #[Test]
@@ -34,10 +34,10 @@ final class StateBuildContextTest extends UnitTestCase
             workspaceId: 2,
         );
 
-        self::assertSame(ApplicationType::BACKEND, $context->applicationType);
-        self::assertSame(42, $context->pageId);
-        self::assertSame(1, $context->languageId);
-        self::assertSame(3, $context->backendUserId);
-        self::assertSame(2, $context->workspaceId);
+        $this->assertSame(ApplicationType::BACKEND, $context->applicationType);
+        $this->assertSame(42, $context->pageId);
+        $this->assertSame(1, $context->languageId);
+        $this->assertSame(3, $context->backendUserId);
+        $this->assertSame(2, $context->workspaceId);
     }
 }
