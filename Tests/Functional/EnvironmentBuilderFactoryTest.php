@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace FGTCLB\EnvironmentStateManager\Tests\Functional;
 
+use FGTCLB\EnvironmentStateManager\Core12\BackendEnvironmentBuilder as Core12BackendEnvironmentBuilder;
 use FGTCLB\EnvironmentStateManager\Core12\FrontendEnvironmentBuilder as Core12FrontendEnvironmentBuilder;
+use FGTCLB\EnvironmentStateManager\Core13\BackendEnvironmentBuilder as Core13BackendEnvironmentBuilder;
 use FGTCLB\EnvironmentStateManager\Core13\FrontendEnvironmentBuilder as Core13FrontendEnvironmentBuilder;
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderFactory;
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderFactoryInterface;
@@ -58,16 +60,29 @@ final class EnvironmentBuilderFactoryTest extends AbstractEnvironmentStateManage
         $this->assertInstanceOf(Core13FrontendEnvironmentBuilder::class, $builder);
     }
 
+    #[Group('not-core-13')]
     #[Test]
-    public function createThrowsExceptionForBackendEnvironmentBuilderInstance(): void
+    public function createReturnsTypoV12BackendEnvironmentBuilderInstance(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1762256802);
         $stateBuildContext = new StateBuildContext(
             applicationType: ApplicationType::BACKEND,
             pageId: null,
             languageId: null,
         );
-        GeneralUtility::makeInstance(EnvironmentBuilderFactory::class)->create($stateBuildContext);
+        $builder = GeneralUtility::makeInstance(EnvironmentBuilderFactory::class)->create($stateBuildContext);
+        $this->assertInstanceOf(Core12BackendEnvironmentBuilder::class, $builder);
+    }
+
+    #[Group('not-core-12')]
+    #[Test]
+    public function createReturnsTypoV13BackendEnvironmentBuilderInstance(): void
+    {
+        $stateBuildContext = new StateBuildContext(
+            applicationType: ApplicationType::BACKEND,
+            pageId: null,
+            languageId: null,
+        );
+        $builder = GeneralUtility::makeInstance(EnvironmentBuilderFactory::class)->create($stateBuildContext);
+        $this->assertInstanceOf(Core13BackendEnvironmentBuilder::class, $builder);
     }
 }

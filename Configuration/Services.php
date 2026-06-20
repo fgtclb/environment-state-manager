@@ -57,10 +57,16 @@ return static function (
         ->autoconfigure()
         ->autowire()
         ->public();
+    $services
+        ->set($coreVersionRelatedBaseNamespace . 'BackendEnvironmentBuilder')
+        ->autoconfigure()
+        ->autowire()
+        ->public();
     // Set concrete classes for meta factory
     $services
         ->set(EnvironmentBuilderFactory::class)
         ->arg('$frontendEnvironmentBuilder', service($coreVersionRelatedBaseNamespace . 'FrontendEnvironmentBuilder'))
+        ->arg('$backendEnvironmentBuilder', service($coreVersionRelatedBaseNamespace . 'BackendEnvironmentBuilder'))
         ->autowire()
         ->autoconfigure()
         ->public();
