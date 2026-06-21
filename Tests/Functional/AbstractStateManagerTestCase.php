@@ -8,6 +8,7 @@ use FGTCLB\EnvironmentStateManager\EnvironmentBuilderFactoryInterface;
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderInterface;
 use FGTCLB\EnvironmentStateManager\Event\StateApplyEvent;
 use FGTCLB\EnvironmentStateManager\Event\StateBackupEvent;
+use FGTCLB\EnvironmentStateManager\StateBuildContext;
 use FGTCLB\EnvironmentStateManager\StateInterface;
 use FGTCLB\EnvironmentStateManager\StateManagerInterface;
 use PHPUnit\Framework\Attributes\Test;
@@ -64,6 +65,11 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
      * Assert the context a freshly backed-up state carries on the running TYPO3 core version.
      */
     abstract protected function assertBackedUpStateContext(StateInterface $state): void;
+
+    /**
+     * The version-specific error code bootstrap() raises when a builder returns a non-extended state.
+     */
+    abstract protected function nonExtendedStateExceptionCode(): int;
 
     protected function tearDown(): void
     {
@@ -212,6 +218,39 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $this->assertCount(2, $dispatchedApplyEvents);
     }
 
+    #[Test]
+    public function resetClearsEnvironmentAndDispatchesApplyEvent(): void
+    {
+        $dispatchedApplyEvents = [];
+        $this->interceptApplyEvents($dispatchedApplyEvents);
+        $GLOBALS['TYPO3_REQUEST'] = $this->createMock(ServerRequestInterface::class);
+        $GLOBALS['TSFE'] = $this->createMock(TypoScriptFrontendController::class);
+        $GLOBALS['BE_USER'] = $this->createMock(BackendUserAuthentication::class);
+        $stateManager = $this->createStateManager();
+        // execution
+        $stateManager->reset();
+        // after - the empty state cleared every managed global ...
+        $this->assertArrayNotHasKey('TYPO3_REQUEST', $GLOBALS);
+        $this->assertArrayNotHasKey('TSFE', $GLOBALS);
+        $this->assertArrayNotHasKey('BE_USER', $GLOBALS);
+        // ... and an apply event was dispatched.
+        $this->assertCount(1, $dispatchedApplyEvents);
+    }
+
+    #[Test]
+    public function bootstrapThrowsWhenBuilderReturnsNonExtendedState(): void
+    {
+        $nonExtendedState = $this->createMock(StateInterface::class);
+        $environmentBuilderMock = $this->createEnvironmentBuilderMock();
+        $environmentBuilderMock->method('build')->willReturn($nonExtendedState);
+        $stateManager = $this->createStateManager($this->createEnvironmentBuilderFactoryMock($environmentBuilderMock));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionCode($this->nonExtendedStateExceptionCode());
+
+        $stateManager->bootstrap(new StateBuildContext(applicationType: ApplicationType::FRONTEND));
+    }
+
     /**
      * @param list<StateBackupEvent> $collector
      */
@@ -250,8 +289,8 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $environmentBuilderFactoryMock = $this->createMock(EnvironmentBuilderFactoryInterface::class);
         $environmentBuilderFactoryMock
             ->method('create')
-            ->willReturnCallback(function (ApplicationType $applicationType) use ($frontendEnvironmentBuilder): EnvironmentBuilderInterface {
-                if ($applicationType === ApplicationType::BACKEND) {
+            ->willReturnCallback(function (StateBuildContext $stateBuildContext) use ($frontendEnvironmentBuilder): EnvironmentBuilderInterface {
+                if ($stateBuildContext->applicationType === ApplicationType::BACKEND) {
                     throw new \RuntimeException(
                         'Only frontend applicationType implemented for mocked environmentFactoryMock',
                         1762298777,

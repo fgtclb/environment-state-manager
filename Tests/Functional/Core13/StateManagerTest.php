@@ -61,4 +61,9 @@ final class StateManagerTest extends AbstractStateManagerTestCase
         // behaviour is covered by restoreSetsExpectedStateToEnvironment().
         $this->assertIsObject($state->context());
     }
+
+    protected function nonExtendedStateExceptionCode(): int
+    {
+        return 1762264322;
+    }
 }
