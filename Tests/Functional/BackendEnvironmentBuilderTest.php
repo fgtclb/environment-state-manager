@@ -142,4 +142,36 @@ final class BackendEnvironmentBuilderTest extends AbstractEnvironmentStateManage
         $this->assertArrayNotHasKey('BE_USER', $GLOBALS);
         $this->assertArrayNotHasKey('LANG', $GLOBALS);
     }
+
+    #[Test]
+    public function executeRestoresEnvironmentWhenClosureThrows(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/BackendEnvironment/pages.csv');
+
+        // Before: clean environment.
+        $this->assertArrayNotHasKey('BE_USER', $GLOBALS);
+
+        $backendUserInsideClosure = null;
+        $caughtException = null;
+        try {
+            $this->get(StateManagerInterface::class)->execute(
+                new StateBuildContext(applicationType: ApplicationType::BACKEND, pageId: 1),
+                function () use (&$backendUserInsideClosure): void {
+                    $backendUserInsideClosure = $GLOBALS['BE_USER'] ?? null;
+                    throw new \RuntimeException('failure inside the managed environment', 1762700000);
+                }
+            );
+        } catch (\RuntimeException $exception) {
+            $caughtException = $exception;
+        }
+
+        // The closure ran inside an active backend environment ...
+        $this->assertInstanceOf(BackendUserAuthentication::class, $backendUserInsideClosure);
+        // ... the exception propagated out of execute() ...
+        $this->assertInstanceOf(\RuntimeException::class, $caughtException);
+        $this->assertSame(1762700000, $caughtException->getCode());
+        // ... and the previous (empty) environment was restored despite the exception.
+        $this->assertArrayNotHasKey('BE_USER', $GLOBALS);
+        $this->assertArrayNotHasKey('LANG', $GLOBALS);
+    }
 }

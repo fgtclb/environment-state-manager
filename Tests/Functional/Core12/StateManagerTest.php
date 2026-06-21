@@ -62,4 +62,9 @@ final class StateManagerTest extends AbstractStateManagerTestCase
         // TYPO3 v12 seeds a typoscript aspect on the default context.
         $this->assertTrue($context->hasAspect('typoscript'));
     }
+
+    protected function nonExtendedStateExceptionCode(): int
+    {
+        return 1762264455;
+    }
 }
