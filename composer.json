@@ -79,7 +79,8 @@
         },
         "typo3/cms": {
             "extension-key": "environment_state_manager",
-            "web-dir": ".Build/Web"
+            "web-dir": ".Build/Web",
+            "version": "1.0.0"
         }
     },
     "support": {
