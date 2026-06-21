@@ -19,3 +19,4 @@ backward-compatibility promise and what is internal.
     EnvironmentBuilder/Index
     StateManager/Index
     PublicApi/Index
+    VersioningPolicy/Index

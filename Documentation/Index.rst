@@ -44,14 +44,14 @@ safely backs up and restores the global state around such an operation.
 This functionality was extracted from ``fgtclb/academic-base`` into a
 dedicated, reusable extension.
 
-Over the time there has been multiple extensions to allow the creation of the
+Over time there have been multiple extensions that allowed creating the
 `TypoScriptFrontendController (TSFE)` but missed all the other handling and
-state in various places. They further lacked all a proper state management
-and build when used in FE or BE web-requests and did not returned to the
-previous state leaving the context in a populated (broken) state, something
-this extension tries to handle more properly over the different TYPO3 versions.
+state in various places. They further lacked proper state management and
+building when used in FE or BE web-requests and did not return to the
+previous state, leaving the context in a populated (broken) state - something
+this extension tries to handle more properly across the different TYPO3 versions.
 
-It ca be used in tasks, commands, schedulers, frontend requests, backend requests
+It can be used in tasks, commands, schedulers, frontend requests, backend requests
 and also within functional tests to properly build the more global state.
 
 ----
