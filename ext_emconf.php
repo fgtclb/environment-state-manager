@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'FGTCLB: Environment State Manager',
     'description' => 'Environment builder and state manager for TYPO3 CMS.',
-    'version' => '1.0.0',
+    'version' => '1.0.1',
     'category' => 'misc',
     'state' => 'stable',
     'author' => 'FGTCLB',
