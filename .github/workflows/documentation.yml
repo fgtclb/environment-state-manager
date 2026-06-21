@@ -1,0 +1,29 @@
+name: "Documentation & composer"
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  documentation:
+    name: "render documentation"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Render documentation"
+        run: "Build/Scripts/runTests.sh -s renderDocumentation"
+
+  composer-validate:
+    name: "composer validate"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Validate composer.json"
+        run: "Build/Scripts/runTests.sh -s composerValidate"
