@@ -12,6 +12,8 @@ use FGTCLB\EnvironmentStateManager\StateManagerExecuteMethodTrait;
 use FGTCLB\EnvironmentStateManager\StateManagerInterface;
 use FGTCLB\EnvironmentStateManager\StateManagerRootStateInterfaceHelperMethodsTrait;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Default implementation of {@see StateManagerInterface} for TYPO3 v13.
@@ -48,7 +50,12 @@ final class StateManager implements StateManagerInterface
     {
         $state = $this->backupStateInterface(new State());
         if ($state instanceof ExtendedStateInterface) {
-            // No special handling is required for the extended interface at the moment.
+            // The TypoScriptFrontendController is TYPO3 v13 specific state (deprecated, removed in
+            // v14) and is therefore captured here, on the extended state, rather than in the
+            // version-agnostic backup helper.
+            /** @var TypoScriptFrontendController|null $typoScriptFrontendController */
+            $typoScriptFrontendController = $GLOBALS['TSFE'] ?? null;
+            $state = $state->withTypoScriptFrontendController($typoScriptFrontendController);
         }
         $state = $this->dispatchStateBackupEvent($state);
         /** @var State $state */
@@ -115,7 +122,18 @@ final class StateManager implements StateManagerInterface
     {
         $this->applyStateInterface($state);
         if ($state instanceof ExtendedStateInterface) {
-            // No special handling is required for the extended interface at the moment.
+            // The TypoScriptFrontendController is TYPO3 v13 specific state (deprecated, removed in
+            // v14) and is therefore applied here, on the extended state, rather than in the
+            // version-agnostic apply helper.
+            $typoScriptFrontendController = $state->typoScriptFrontendController();
+            if ($typoScriptFrontendController !== null) {
+                $GLOBALS['TSFE'] = $typoScriptFrontendController;
+                // A fresh ServerRequest is only passed to satisfy the signature; a request should
+                // always exist when the snapshot carries a TypoScriptFrontendController.
+                $typoScriptFrontendController->newCObj($state->request() ?? new ServerRequest());
+            } else {
+                unset($GLOBALS['TSFE']);
+            }
         }
         $this->dispatchStateApplyEvent($state);
     }
