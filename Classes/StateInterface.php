@@ -9,7 +9,6 @@ use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Interface defining the methods shared across all supported TYPO3 versions,
@@ -17,13 +16,15 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  *
  * This interface is part of the public API and is the type you receive from the state manager and
  * environment builder. Type-hint it instead of the concrete `Core*` state implementations.
+ *
+ * TYPO3 core-version specific state lives on the `Core*\ExtendedStateInterface` instead of this
+ * version-agnostic contract. The TypoScriptFrontendController accessors are declared there, because
+ * the TypoScriptFrontendController is deprecated in TYPO3 v13 and removed in TYPO3 v14.
  */
 interface StateInterface
 {
     public function withRequest(?ServerRequestInterface $request = null): self;
     public function request(): ?ServerRequestInterface;
-    public function withTypoScriptFrontendController(?TypoScriptFrontendController $typoScriptFrontendController = null): self;
-    public function typoScriptFrontendController(): ?TypoScriptFrontendController;
     public function withPageRenderer(?PageRenderer $pageRenderer = null): self;
     public function pageRenderer(): ?PageRenderer;
     public function withBackendUserAuthentication(?BackendUserAuthentication $backendUserAuthentication = null): self;

@@ -10,14 +10,11 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Http\ApplicationType;
-use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * This trait provides internal helper methods built around the {@see StateInterface} getters, so
@@ -68,18 +65,9 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         } else {
             unset($GLOBALS['TYPO3_REQUEST']);
         }
-        /** @var ContentObjectRenderer|null $contentObjectRenderer */
-        $contentObjectRenderer = null;
-        if ($state->typoScriptFrontendController() !== null) {
-            $GLOBALS['TSFE'] = $state->typoScriptFrontendController();
-            // A fresh ServerRequest is only passed here to keep PHPStan happy across multiple core
-            // versions; a request should always exist when the state snapshot contains a
-            // TypoScriptFrontendController.
-            $GLOBALS['TSFE']->newCObj($state->request() ?? new ServerRequest());
-            $contentObjectRenderer = $GLOBALS['TSFE']->cObj;
-        } else {
-            unset($GLOBALS['TSFE']);
-        }
+        // The TypoScriptFrontendController is TYPO3 core-version specific (deprecated in v13, removed
+        // in v14) and is therefore applied by the version-specific state managers through the
+        // `ExtendedStateInterface` hook, not here.
         if ($state->backendUserAuthentication() !== null) {
             $GLOBALS['BE_USER'] = $state->backendUserAuthentication();
         } else {
@@ -123,19 +111,14 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         }
         // Provide the active request to the Extbase ConfigurationManager. This only depends on the
         // request, not on a ContentObjectRenderer, so it runs whenever a request exists (frontend
-        // and backend) and is intentionally not nested in the cObj branch below.
+        // and backend). The TYPO3 v12 ContentObjectRenderer wiring (`setContentObject()`) is bound to
+        // the TypoScriptFrontendController and therefore handled by the version-specific state
+        // managers through the `ExtendedStateInterface` hook.
         if ($state->request() !== null) {
             $configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
             if (method_exists($configurationManager, 'setRequest')) {
                 // TYPO3 v13
                 $configurationManager->setRequest($state->request());
-            }
-        }
-        if ($contentObjectRenderer !== null) {
-            $configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
-            if (method_exists($configurationManager, 'setContentObject')) {
-                // TYPO3 v12
-                $configurationManager->setContentObject($contentObjectRenderer);
             }
         }
     }
@@ -145,8 +128,6 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         $context = clone GeneralUtility::makeInstance(Context::class);
         /** @var ServerRequestInterface|null $request */
         $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
-        /** @var TypoScriptFrontendController|null $typoScriptFrontendController */
-        $typoScriptFrontendController = $GLOBALS['TSFE'] ?? null;
         $applicationType = $request !== null && $request->getAttribute('applicationType') ?: null;
         $pageRenderer = $request !== null && $applicationType !== null ? GeneralUtility::makeInstance(PageRenderer::class) : null;
         $superGlobals = [];
@@ -160,10 +141,12 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         }
         /** @var LanguageService|null $languageService */
         $languageService = $GLOBALS['LANG'] ?? null;
+        // The TypoScriptFrontendController is read from $GLOBALS by the version-specific state
+        // managers through the `ExtendedStateInterface` hook, as it is TYPO3 core-version specific
+        // state (deprecated in v13, removed in v14).
         return $state
             ->withContext($context)
             ->withRequest($request)
-            ->withTypoScriptFrontendController($typoScriptFrontendController)
             ->withBackendUserAuthentication($GLOBALS['BE_USER'] ?? null)
             ->withLanguageService($languageService)
             ->withPageRenderer($pageRenderer)
