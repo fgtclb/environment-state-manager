@@ -30,14 +30,14 @@ state around such an operation.
 This functionality was extracted from `fgtclb/academic-base` into a dedicated,
 reusable extension.
 
-Over the time there has been multiple extensions to allow the creation of the
+Over time there have been multiple extensions that allowed creating the
 `TypoScriptFrontendController (TSFE)` but missed all the other handling and
-state in various places. They further lacked all a proper state management
-and build when used in FE or BE web-requests and did not returned to the
-previous state leaving the context in a populated (broken) state, something
-this extension tries to handle more properly over the different TYPO3 versions.
+state in various places. They further lacked proper state management and
+building when used in FE or BE web-requests and did not return to the
+previous state, leaving the context in a populated (broken) state - something
+this extension tries to handle more properly across the different TYPO3 versions.
 
-It ca be used in tasks, commands, schedulers, frontend requests, backend requests
+It can be used in tasks, commands, schedulers, frontend requests, backend requests
 and also within functional tests to properly build the more global state.
 
 ## Features
@@ -183,7 +183,7 @@ echo '>> Create release' ; \
   git remote prune origin && \
   git tag ${RELEASE_VERSION} && \
   git push origin ${RELEASE_VERSION} && \
-  echo ">> Post-release - set dev version: ${DEV_VRESION}-dev" && \
+  echo ">> Post-release - set dev version: ${DEV_VERSION}-dev" && \
   git checkout -b set-dev-version-${DEV_VERSION} && \
   sed -i "s/^COMPOSER_ROOT_VERSION.*/COMPOSER_ROOT_VERSION=\"${DEV_VERSION}-dev\"/" Build/Scripts/runTests.sh && \
   tailor set-version ${DEV_VERSION} && \
@@ -200,7 +200,9 @@ echo '>> Create release' ; \
   git remote prune origin
 ```
 
-This triggers the `on push tags` workflow (`publish.yml`) which creates the upload package,
+This triggers the `on push tags` workflow (`publish.yml`), which creates the
+upload package, attaches it to a GitHub release for the tag, and publishes the
+new version to the TYPO3 Extension Repository (TER).
 
 ## License
 
