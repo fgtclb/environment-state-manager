@@ -159,7 +159,7 @@ echo '>> Create release' ; \
   RELEASE_VERSION='1.0.0' ; \
   DEV_VERSION='1.0.1' ; \
   echo ">> Checkout branches" && \
-  git checkout master && \
+  git checkout main && \
   git fetch --all && \
   git pull --rebase && \
   git checkout ${RELEASE_BRANCH} && \
