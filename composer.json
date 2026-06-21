@@ -4,6 +4,15 @@
     "type": "typo3-cms-extension",
     "homepage": "https://www.fgtclb.com/",
     "license": "GPL-2.0-or-later",
+    "keywords": [
+        "typo3",
+        "typo3-cms-extension",
+        "environment",
+        "state-manager",
+        "environment-builder",
+        "tsfe",
+        "testing"
+    ],
     "authors": [
         {
             "name": "FGTCLB GmbH",
@@ -56,6 +65,13 @@
         "psr-4": {
             "FGTCLB\\EnvironmentStateManager\\Tests\\": "Tests/"
         }
+    },
+    "scripts": {
+        "cgl": "Build/Scripts/runTests.sh -s cgl",
+        "phpstan": "Build/Scripts/runTests.sh -s phpstan",
+        "test:unit": "Build/Scripts/runTests.sh -s unit",
+        "test:functional": "Build/Scripts/runTests.sh -d sqlite -s functional",
+        "docs": "Build/Scripts/runTests.sh -s renderDocumentation"
     },
     "extra": {
         "branch-alias": {
