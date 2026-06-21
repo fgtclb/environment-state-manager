@@ -186,6 +186,7 @@ Options:
             - composer: "composer" with all remaining arguments dispatched.
             - composerInstall: "composer install"
             - composerUpdate: "composer update", handy if host has no PHP
+            - composerValidate: "composer validate --strict" of the root composer.json
             - functional: PHP functional tests
             - lintPhp: PHP linting
             - phpstan: phpstan tests
@@ -519,6 +520,10 @@ case ${TEST_SUITE} in
         ;;
     composerInstall)
         ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.Build/.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} composer install
+        SUITE_EXIT_CODE=$?
+        ;;
+    composerValidate)
+        ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.Build/.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} composer validate --strict --no-check-lock
         SUITE_EXIT_CODE=$?
         ;;
     composerUpdate)
