@@ -121,12 +121,18 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         if ($state->pageRenderer() !== null) {
             GeneralUtility::setSingletonInstance(PageRenderer::class, $state->pageRenderer());
         }
-        if ($contentObjectRenderer !== null) {
+        // Provide the active request to the Extbase ConfigurationManager. This only depends on the
+        // request, not on a ContentObjectRenderer, so it runs whenever a request exists (frontend
+        // and backend) and is intentionally not nested in the cObj branch below.
+        if ($state->request() !== null) {
             $configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
-            if (method_exists($configurationManager, 'setRequest') && $state->request() !== null) {
+            if (method_exists($configurationManager, 'setRequest')) {
                 // TYPO3 v13
                 $configurationManager->setRequest($state->request());
             }
+        }
+        if ($contentObjectRenderer !== null) {
+            $configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
             if (method_exists($configurationManager, 'setContentObject')) {
                 // TYPO3 v12
                 $configurationManager->setContentObject($contentObjectRenderer);
