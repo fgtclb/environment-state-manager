@@ -13,14 +13,8 @@ use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
 use TYPO3\CMS\Core\Context\Context;
-use TYPO3\CMS\Core\Context\DateTimeAspect;
-use TYPO3\CMS\Core\Context\LanguageAspect;
 use TYPO3\CMS\Core\Context\LanguageAspectFactory;
-use TYPO3\CMS\Core\Context\UserAspect;
-use TYPO3\CMS\Core\Context\VisibilityAspect;
-use TYPO3\CMS\Core\Context\WorkspaceAspect;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
-use TYPO3\CMS\Core\Domain\DateTimeFactory;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Exception\Page\RootLineException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
@@ -312,18 +306,5 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     {
         $propertyAccessor = new \ReflectionProperty(Context::class, 'aspects');
         $propertyAccessor->setValue($context, $propertyAccessor->getValue($overrideContext));
-    }
-
-    final protected function resetContextData(Context $context): void
-    {
-        $propertyAccessor = new \ReflectionProperty(Context::class, 'aspects');
-        $propertyAccessor->setValue($context, [
-            'date' => new DateTimeAspect(DateTimeFactory::createFromTimestamp($GLOBALS['EXEC_TIME'])),
-            'visibility' => new VisibilityAspect(),
-            'backend.user' => new UserAspect(),
-            'frontend.user' => new UserAspect(),
-            'workspace' => new WorkspaceAspect(),
-            'language' => new LanguageAspect(),
-        ]);
     }
 }
