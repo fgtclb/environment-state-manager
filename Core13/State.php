@@ -17,11 +17,9 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * Holds a single environment snapshot, either populated from the current environment or used to
  * create a new one. TYPO3 v13 only.
  *
- * The `#[Exclude]` attribute is set on purpose. It keeps this class from being compiled
- * early into the dependency injection container, which would otherwise trigger missing-class
- * and similar errors for unrelated TYPO3 versions. The TYPO3 version-aware configuration is
- * handled and re-enabled in the `EXT:environment_state_manager/Configuration/Services.php` file.
- * Since this class is a DTO, it should always be excluded anyway.
+ * The `#[Exclude]` attribute keeps this class out of the dependency injection container: it is a
+ * data transfer object created explicitly through the environment builder and state manager, never
+ * resolved as a service.
  *
  * @internal Concrete, TYPO3 v13 specific implementation of {@see StateInterface} (and
  *           {@see ExtendedStateInterface}). Created through the environment builder and the state

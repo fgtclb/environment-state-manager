@@ -18,8 +18,9 @@ global TYPO3 state and is able to back up and restore that state.
     :ref:`environment builder <developer-environment-builder>` for a backend
     example.
 
-The state manager is registered as a public service and resolved to a TYPO3
-core version compatible implementation. Inject it through dependency injection:
+The state manager is available as a public service through
+:php:`StateManagerInterface`, resolved to a TYPO3 core version compatible
+implementation. Inject it through dependency injection:
 
 ..  code-block:: php
 
