@@ -61,10 +61,16 @@ service and can be injected through dependency injection:
         }
     }
 
-The returned :php:`StateInterface` holds the bootstrapped environment elements,
-for example the :php:`ServerRequestInterface`, the
-:php:`TypoScriptFrontendController`, the :php:`PageRenderer` and the
-:php:`Context`.
+The returned :php:`StateInterface` holds the version-agnostic bootstrapped
+environment elements, for example the :php:`ServerRequestInterface`, the
+:php:`PageRenderer` and the :php:`Context`.
+
+TYPO3 core-version specific state lives on the matching
+:php:`Core12\ExtendedStateInterface` / :php:`Core13\ExtendedStateInterface`. In
+particular the :php:`TypoScriptFrontendController` accessors are declared there,
+because the :php:`TypoScriptFrontendController` is deprecated in TYPO3 v13 and
+removed in TYPO3 v14. Narrow the returned state to an :php:`ExtendedStateInterface`
+when you explicitly need that version-specific state.
 
 ..  note::
 
