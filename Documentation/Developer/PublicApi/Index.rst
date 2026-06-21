@@ -44,9 +44,14 @@ The following types form the public API. Depend on these interfaces and types:
 
 The TYPO3 core-version specific :php:`Core12\ExtendedStateInterface` and
 :php:`Core13\ExtendedStateInterface` extend :php:`StateInterface` and are part
-of the public API as well. They exist for future version-specific additions to
-the state contract. Type-hint the version-agnostic :php:`StateInterface` in code
-that should work across core versions, and only reference an
+of the public API as well. They carry the version-specific parts of the state
+contract: the :php:`TypoScriptFrontendController` accessors
+(:php:`withTypoScriptFrontendController()` and
+:php:`typoScriptFrontendController()`) are declared here, and not on the
+version-agnostic :php:`StateInterface`, because the
+:php:`TypoScriptFrontendController` is deprecated in TYPO3 v13 and removed in
+TYPO3 v14. Type-hint the version-agnostic :php:`StateInterface` in code that
+should work across core versions, and only reference an
 :php:`ExtendedStateInterface` when you explicitly target a specific TYPO3 core
 version.
 
