@@ -89,7 +89,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             'HTTPS' => ($uri->getScheme() === 'https' ? 'on' : 'off'),
             'SCRIPT_FILENAME' => __FILE__,
             'SCRIPT_NAME' => rtrim($uri->getPath(), '/') . '/',
-            'REMOTE_ADDR' => '127.0.1',
+            'REMOTE_ADDR' => '127.0.0.1',
             'REQUEST_URI' => '/' . ltrim($uri->getPath(), '/'),
         ];
         foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
