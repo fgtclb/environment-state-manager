@@ -24,17 +24,6 @@ use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
  */
 trait StateManagerRootStateInterfaceHelperMethodsTrait
 {
-    /** @var string[] */
-    private $SERVER_SUPERGLOBAL_VARS = [
-        'HTTP_HOST',
-        'SERVER_NAME',
-        'HTTPS',
-        'SCRIPT_FILENAME',
-        'SCRIPT_NAME',
-        'REMOTE_ADDR',
-        'REQUEST_URI',
-    ];
-
     final protected function applyStateInterface(StateInterface $state): void
     {
         if (!$this instanceof StateManagerInterface) {
@@ -80,7 +69,7 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         }
         // Apply the super globals.
         $superGlobals = $state->additionalData('_SERVER');
-        foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
+        foreach (ServerEnvironmentVariables::NAMES as $var) {
             if (!is_array($superGlobals)) {
                 if (!is_array($_SERVER)) {
                     // No super globals wanted for the environment and the super global does not exist, so skip it.
@@ -132,7 +121,7 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         $pageRenderer = $request !== null && $applicationType !== null ? GeneralUtility::makeInstance(PageRenderer::class) : null;
         $superGlobals = [];
         if (is_array($_SERVER)) {
-            foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
+            foreach (ServerEnvironmentVariables::NAMES as $var) {
                 if (array_key_exists($var, $_SERVER)) {
                     $superGlobals['_SERVER'] ??= [];
                     $superGlobals['_SERVER'][$var] = $_SERVER[$var];
