@@ -5,21 +5,37 @@ declare(strict_types=1);
 namespace FGTCLB\EnvironmentStateManager;
 
 use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound;
-use Symfony\Component\DependencyInjection\Attribute\Exclude;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use TYPO3\CMS\Core\Http\ApplicationType;
 
 /**
  * Default environment builder factory implementation for {@see EnvironmentBuilderFactoryInterface}.
  *
+ * This factory is version-agnostic and lives in the `Classes/` folder. It is registered as a public
+ * dependency injection service (`#[Autoconfigure(public: true)]`) and published as the public API
+ * {@see EnvironmentBuilderFactoryInterface} via `#[AsAlias]`.
+ *
  * @internal Concrete implementation of {@see EnvironmentBuilderFactoryInterface}. Resolved through
  *           dependency injection — type-hint the interface, not this class. Not covered by the
  *           extension's public-API backward-compatibility promise.
  */
-#[Exclude]
+#[Autoconfigure(public: true)]
+#[AsAlias(id: EnvironmentBuilderFactoryInterface::class, public: true)]
 final class EnvironmentBuilderFactory implements EnvironmentBuilderFactoryInterface
 {
+    /**
+     * Both builders share the {@see EnvironmentBuilderInterface} type, which autowiring cannot tell
+     * apart. They are therefore injected explicitly via `#[Autowire(service: ...)]` from the stable,
+     * version-independent service ids that the concrete `CoreNN` frontend and backend builders
+     * publish through their `#[AsAlias]` attribute — resolving to whichever `Core{major}/` folder is
+     * loaded for the running TYPO3 version.
+     */
     public function __construct(
+        #[Autowire(service: 'fgtclb.environment_state_manager.frontend_environment_builder')]
         private readonly EnvironmentBuilderInterface $frontendEnvironmentBuilder,
+        #[Autowire(service: 'fgtclb.environment_state_manager.backend_environment_builder')]
         private readonly EnvironmentBuilderInterface $backendEnvironmentBuilder,
     ) {}
 

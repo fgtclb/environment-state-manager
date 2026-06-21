@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\EnvironmentStateManager\Core13;
+namespace FGTCLB\EnvironmentStateManager\Core12;
 
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderFactoryInterface;
 use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound;
@@ -11,21 +11,22 @@ use FGTCLB\EnvironmentStateManager\StateInterface;
 use FGTCLB\EnvironmentStateManager\StateManagerExecuteMethodTrait;
 use FGTCLB\EnvironmentStateManager\StateManagerInterface;
 use FGTCLB\EnvironmentStateManager\StateManagerRootStateInterfaceHelperMethodsTrait;
-use Symfony\Component\DependencyInjection\Attribute\Exclude;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
 /**
- * Default implementation of {@see StateManagerInterface} for TYPO3 v13.
+ * Default implementation of {@see StateManagerInterface} for TYPO3 v12.
  *
- * The `#[Exclude]` attribute is set on purpose. It keeps this class from being compiled
- * early into the dependency injection container, which would otherwise trigger missing-class
- * and similar errors for unrelated TYPO3 versions. The TYPO3 version-aware configuration is
- * handled and re-enabled in the `EXT:environment_state_manager/Configuration/Services.php` file.
+ * This class lives in the root-level `Core12/` folder and is loaded into the dependency injection
+ * container exclusively when the running TYPO3 major version is 12. The version-aware configuration
+ * in `EXT:environment_state_manager/Configuration/Services.php` only loads the `Core{major}/` folder
+ * matching `Typo3Version::getMajorVersion()`. The `#[AsAlias]` attribute below publishes this class
+ * as the version-agnostic {@see StateManagerInterface} service.
  *
- * @internal Concrete, TYPO3 v13 specific implementation of {@see StateManagerInterface}. Resolved
+ * @internal Concrete, TYPO3 v12 specific implementation of {@see StateManagerInterface}. Resolved
  *           through dependency injection — type-hint the interface, not this class. Not covered by
  *           the extension's public-API backward-compatibility promise.
  */
-#[Exclude]
+#[AsAlias(id: StateManagerInterface::class, public: true)]
 final class StateManager implements StateManagerInterface
 {
     use StateManagerRootStateInterfaceHelperMethodsTrait;
@@ -96,7 +97,7 @@ final class StateManager implements StateManagerInterface
                     $state::class,
                     ExtendedStateInterface::class,
                 ),
-                1762264322,
+                1762264455,
             );
         }
         $this->apply($state);

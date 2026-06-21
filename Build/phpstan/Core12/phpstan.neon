@@ -12,9 +12,9 @@ parameters:
 
   paths:
     - ../../../Classes
+    - ../../../Core12
     - ../../../Configuration
     - ../../../Tests
 
   excludePaths:
-    - ../../../Classes/Core13/*
     - ../../../Tests/*/Core13/*

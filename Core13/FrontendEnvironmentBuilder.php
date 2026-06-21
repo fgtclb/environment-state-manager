@@ -2,17 +2,25 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\EnvironmentStateManager\Core12;
+namespace FGTCLB\EnvironmentStateManager\Core13;
 
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderInterface;
 use FGTCLB\EnvironmentStateManager\Exception\SiteConfigCouldNotBeDetermined;
 use FGTCLB\EnvironmentStateManager\StateBuildContext;
 use FGTCLB\EnvironmentStateManager\StateInterface;
-use Symfony\Component\DependencyInjection\Attribute\Exclude;
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\DateTimeAspect;
+use TYPO3\CMS\Core\Context\LanguageAspect;
 use TYPO3\CMS\Core\Context\LanguageAspectFactory;
-use TYPO3\CMS\Core\Context\TypoScriptAspect;
+use TYPO3\CMS\Core\Context\UserAspect;
+use TYPO3\CMS\Core\Context\VisibilityAspect;
+use TYPO3\CMS\Core\Context\WorkspaceAspect;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Domain\DateTimeFactory;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Exception\Page\RootLineException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
@@ -21,27 +29,34 @@ use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Routing\PageArguments;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\TypoScript\FrontendTypoScriptFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\RootlineUtility;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
+use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
+use TYPO3\CMS\Frontend\Cache\CacheInstruction;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Page\PageInformationFactory;
 
 /**
- * Environment builder for TYPO3 v12.
+ * Environment builder for TYPO3 v13.
  *
- * The `#[Exclude]` attribute is set on purpose. It keeps this class from being compiled
- * early into the dependency injection container, which would otherwise trigger missing-class
- * and similar errors for unrelated TYPO3 versions. The TYPO3 version-aware configuration is
- * handled and re-enabled in the `EXT:environment_state_manager/Configuration/Services.php` file.
+ * This class lives in the root-level `Core13/` folder and is loaded into the dependency injection
+ * container exclusively when the running TYPO3 major version is 13 (see
+ * `EXT:environment_state_manager/Configuration/Services.php`, which loads only the `Core{major}/`
+ * folder matching `Typo3Version::getMajorVersion()`). The `#[AsAlias]` attribute below binds it to a
+ * stable, version-independent service id that {@see EnvironmentBuilderFactory} injects as the
+ * frontend builder.
  *
- * @internal Concrete, TYPO3 v12 specific implementation of {@see EnvironmentBuilderInterface}. Resolved
+ * @internal Concrete, TYPO3 v13 specific implementation of {@see EnvironmentBuilderInterface}. Resolved
  *           through dependency injection — type-hint the interface, not this class. Not covered by
  *           the extension's public-API backward-compatibility promise.
  */
-#[Exclude]
+#[AsAlias(id: 'fgtclb.environment_state_manager.frontend_environment_builder')]
 final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
 {
     /** @var string[] */
@@ -57,6 +72,10 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
 
     public function __construct(
         private readonly SiteFinder $siteFinder,
+        private readonly PageInformationFactory $pageInformationFactory,
+        private readonly FrontendTypoScriptFactory $frontendTypoScriptFactory,
+        #[Autowire(service: 'cache.typoscript')]
+        private readonly PhpFrontend $typoScriptCache,
     ) {}
 
     /**
@@ -87,7 +106,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             'HTTPS' => ($uri->getScheme() === 'https' ? 'on' : 'off'),
             'SCRIPT_FILENAME' => __FILE__,
             'SCRIPT_NAME' => rtrim($uri->getPath(), '/') . '/',
-            'REMOTE_ADDR' => '127.0.1',
+            'REMOTE_ADDR' => '127.0.0.1',
             'REQUEST_URI' => '/' . ltrim($uri->getPath(), '/'),
         ];
         foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
@@ -111,9 +130,9 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             $serverParams,
         ))->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE);
         $request = $request
-            ->withAttribute('site', $site)
-            ->withAttribute('siteLanguage', $siteLanguage)
             ->withAttribute('normalizedParams', NormalizedParams::createFromRequest($request))
+            ->withAttribute('site', $site)
+            ->withAttribute('language', $siteLanguage)
             ->withAttribute('extbase', new ExtbaseRequestParameters());
         return $state
             ->withRequest($request)
@@ -125,7 +144,10 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         $request = $state->request() ?? new ServerRequest();
         // Intentionally instantiated with `new` here to get a clean, fresh instance.
         $context = new Context();
+        // Make sure a preview aspect is set on the context.
+        $context->setAspect('frontend.preview', new PreviewAspect());
         $context->setAspect('language', LanguageAspectFactory::createFromSiteLanguage($siteLanguage));
+        $this->overrideContextData(GeneralUtility::makeInstance(Context::class), $context);
         $pageId = $this->getNearestAccessiblePage($stateBuildContext->pageId ?? $site->getRootPageId(), $context)
             ?: $site->getRootPageId();
         // Make sure frontend user authentication is present in the request.
@@ -134,31 +156,39 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         $frontendUser->start($request);
         $this->unpackFrontendUserConfiguration($frontendUser);
         $request = $request->withAttribute('frontend.user', $frontendUser);
-        // Force template parsing via TypoScriptAspect::$forcedTemplateParsing (required to initialize the TypoScript setup).
-        $typoScriptAspect = GeneralUtility::makeInstance(TypoScriptAspect::class, true);
-        $context->setAspect('typoscript', $typoScriptAspect);
-        // Bootstrap the TypoScriptFrontendController.
-        $controller = GeneralUtility::makeInstance(
-            TypoScriptFrontendController::class,
-            $context,
-            $site,
-            $siteLanguage,
-            new PageArguments(
-                pageId: $pageId,
-                pageType: '0',
-                routeArguments: [],
-            ),
-            $frontendUser,
-        );
+        // Prepare the remaining request attributes.
+        $cacheInstruction = new CacheInstruction();
+        $request = $request->withAttribute('frontend.cache.instruction', $cacheInstruction);
+        $pageArguments = new PageArguments($pageId, '0', []);
+        $request = $request->withAttribute('routing', $pageArguments);
+        $pageInformation = $this->pageInformationFactory->create($request);
+        $request = $request->withAttribute('frontend.page.information', $pageInformation);
+        // Bootstrap TypoScriptFrontendController
+        $controller = GeneralUtility::makeInstance(TypoScriptFrontendController::class);
         $request = $request->withAttribute('frontend.controller', $controller);
-        $controller->determineId($request);
-        $controller->calculateLinkVars([]);
-        $request = $controller->getFromCache($request);
-        $controller->releaseLocks();
+        $expressionMatcherVariables = $this->getExpressionMatcherVariables($site, $request, $controller);
+        $frontendTypoScript = $this->frontendTypoScriptFactory->createSettingsAndSetupConditions(
+            $site,
+            $pageInformation->getSysTemplateRows(),
+            // Note: $originalRequest does not contain the site ...
+            $expressionMatcherVariables,
+            $this->typoScriptCache,
+        );
+        // Note that we need the full TypoScript setup array, since it is required for links created
+        // by DatabaseRecordLinkBuilder. Keep this in mind once TSFE is removed in v14.
+        $frontendTypoScript = $this->frontendTypoScriptFactory->createSetupConfigOrFullSetup(
+            true,
+            $frontendTypoScript,
+            $site,
+            $pageInformation->getSysTemplateRows(),
+            $expressionMatcherVariables,
+            '0',
+            $this->typoScriptCache,
+            null
+        );
+        $request = $request->withAttribute('frontend.typoscript', $frontendTypoScript);
+        $controller->initializePageRenderer($request);
         $controller->newCObj($request);
-        if (!$controller->sys_page instanceof PageRepository) {
-            $controller->sys_page = GeneralUtility::makeInstance(PageRepository::class);
-        }
         return $state
             ->withRequest($request)
             ->withTypoScriptFrontendController($controller)
@@ -216,6 +246,36 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     }
 
     /**
+     * @return array{
+     *     request: ServerRequestInterface,
+     *     pageId: int,
+     *     page: array<string, mixed>,
+     *     fullRootLine: array<int, array<string, mixed>>,
+     *     localRootLine: array<int, array<string, mixed>>,
+     *     site: SiteInterface,
+     *     siteLanguage: SiteLanguage,
+     *     tsfe: TypoScriptFrontendController,
+     * }
+     */
+    private function getExpressionMatcherVariables(SiteInterface $site, ServerRequestInterface $request, TypoScriptFrontendController $controller): array
+    {
+        $pageInformation = $request->getAttribute('frontend.page.information');
+        $topDownRootLine = $pageInformation->getRootLine();
+        $localRootline = $pageInformation->getLocalRootLine();
+        ksort($topDownRootLine);
+        return [
+            'request' => $request,
+            'pageId' => $pageInformation->getId(),
+            'page' => $pageInformation->getPageRecord(),
+            'fullRootLine' => $topDownRootLine,
+            'localRootLine' => $localRootline,
+            'site' => $site,
+            'siteLanguage' => $request->getAttribute('language'),
+            'tsfe' => $controller,
+        ];
+    }
+
+    /**
      * Unpacks the serialized frontend user configuration.
      */
     private function unpackFrontendUserConfiguration(FrontendUserAuthentication $frontendUserAuthentication): void
@@ -246,5 +306,24 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         } catch (RootLineException) {
         }
         return 0;
+    }
+
+    final protected function overrideContextData(Context $context, Context $overrideContext): void
+    {
+        $propertyAccessor = new \ReflectionProperty(Context::class, 'aspects');
+        $propertyAccessor->setValue($context, $propertyAccessor->getValue($overrideContext));
+    }
+
+    final protected function resetContextData(Context $context): void
+    {
+        $propertyAccessor = new \ReflectionProperty(Context::class, 'aspects');
+        $propertyAccessor->setValue($context, [
+            'date' => new DateTimeAspect(DateTimeFactory::createFromTimestamp($GLOBALS['EXEC_TIME'])),
+            'visibility' => new VisibilityAspect(),
+            'backend.user' => new UserAspect(),
+            'frontend.user' => new UserAspect(),
+            'workspace' => new WorkspaceAspect(),
+            'language' => new LanguageAspect(),
+        ]);
     }
 }

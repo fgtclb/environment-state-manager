@@ -47,7 +47,9 @@
     },
     "autoload": {
         "psr-4": {
-            "FGTCLB\\EnvironmentStateManager\\": "Classes/"
+            "FGTCLB\\EnvironmentStateManager\\": "Classes/",
+            "FGTCLB\\EnvironmentStateManager\\Core12\\": "Core12/",
+            "FGTCLB\\EnvironmentStateManager\\Core13\\": "Core13/"
         }
     },
     "autoload-dev": {
