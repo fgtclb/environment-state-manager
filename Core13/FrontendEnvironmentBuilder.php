@@ -6,6 +6,7 @@ namespace FGTCLB\EnvironmentStateManager\Core13;
 
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderInterface;
 use FGTCLB\EnvironmentStateManager\Exception\SiteConfigCouldNotBeDetermined;
+use FGTCLB\EnvironmentStateManager\ServerEnvironmentVariables;
 use FGTCLB\EnvironmentStateManager\StateBuildContext;
 use FGTCLB\EnvironmentStateManager\StateInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -53,17 +54,6 @@ use TYPO3\CMS\Frontend\Page\PageInformationFactory;
 #[AsAlias(id: 'fgtclb.environment_state_manager.frontend_environment_builder')]
 final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
 {
-    /** @var string[] */
-    private $SERVER_SUPERGLOBAL_VARS = [
-        'HTTP_HOST',
-        'SERVER_NAME',
-        'HTTPS',
-        'SCRIPT_FILENAME',
-        'SCRIPT_NAME',
-        'REMOTE_ADDR',
-        'REQUEST_URI',
-    ];
-
     public function __construct(
         private readonly SiteFinder $siteFinder,
         private readonly PageInformationFactory $pageInformationFactory,
@@ -103,7 +93,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             'REMOTE_ADDR' => '127.0.0.1',
             'REQUEST_URI' => '/' . ltrim($uri->getPath(), '/'),
         ];
-        foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
+        foreach (ServerEnvironmentVariables::NAMES as $var) {
             if (array_key_exists($var, $serverParams)) {
                 // Required for the environment, so apply it to $_SERVER.
                 $_SERVER[$var] = $serverParams[$var];
