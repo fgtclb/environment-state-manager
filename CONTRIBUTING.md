@@ -13,10 +13,7 @@ TYPO3 testing images on first use and installs dependencies into the
 git-ignored `.Build/` directory.
 
 ```bash
-# Install dependencies (TYPO3 v12, PHP 8.2 — default matrix).
-Build/Scripts/runTests.sh -t 12 -p 8.2 -s composerUpdate
-
-# Switch the working copy to the TYPO3 v13 dependency set.
+# Install dependencies (TYPO3 v13, PHP 8.2 — default matrix).
 Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
 ```
 

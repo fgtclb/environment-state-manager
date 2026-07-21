@@ -66,7 +66,7 @@ environment elements, for example the :php:`ServerRequestInterface`, the
 :php:`PageRenderer` and the :php:`Context`.
 
 TYPO3 core-version specific state lives on the matching
-:php:`Core12\ExtendedStateInterface` / :php:`Core13\ExtendedStateInterface`. In
+:php:`Core13\ExtendedStateInterface`. In
 particular the :php:`TypoScriptFrontendController` accessors are declared there,
 because the :php:`TypoScriptFrontendController` is deprecated in TYPO3 v13 and
 removed in TYPO3 v14. Narrow the returned state to an :php:`ExtendedStateInterface`
@@ -76,7 +76,7 @@ when you explicitly need that version-specific state.
 
     Always type-hint the :php:`EnvironmentBuilderFactoryInterface`,
     :php:`EnvironmentBuilderInterface` and :php:`StateInterface`, never the
-    concrete :php:`Core12\*` or :php:`Core13\*` classes. The dependency injection
+    concrete :php:`Core13\*` classes. The dependency injection
     container resolves the implementation for the running TYPO3 core version. See
     :ref:`developer-public-api` for the full public API surface.
 

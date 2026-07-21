@@ -41,7 +41,7 @@ backward-compatible path can be provided:
 
 Not every change can go through a deprecation phase. TYPO3 core-version specific
 state, such as the :php:`TypoScriptFrontendController` accessors, lives on the
-TYPO3 core-version specific ``Core12``/``Core13`` ``ExtendedStateInterface`` and
+TYPO3 core-version specific ``Core13`` ``ExtendedStateInterface`` and
 not on the version-agnostic :php:`StateInterface`. As the
 :php:`TypoScriptFrontendController` is deprecated in TYPO3 v13 and removed in
 TYPO3 v14, a future TYPO3 v14 extended interface will simply omit those

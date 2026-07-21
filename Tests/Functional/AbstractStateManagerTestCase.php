@@ -32,7 +32,7 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * across TYPO3 core versions and live here. The few TYPO3 core-version specific concerns - the
  * concrete `State`/`StateManager` classes, the TypoScriptFrontendController accessors on the extended
  * state, and which context aspect the running core seeds on a backed-up state - are delegated to the
- * abstract hooks the thin `Core12`/`Core13` subclasses implement.
+ * abstract hooks the thin `CoreNN` subclasses implement.
  */
 abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateManagerTestCase
 {

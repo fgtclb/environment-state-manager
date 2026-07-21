@@ -15,6 +15,3 @@ parameters:
     - ../../../Core13
     - ../../../Configuration
     - ../../../Tests
-
-  excludePaths:
-    - ../../../Tests/*/Core12/*

@@ -51,7 +51,6 @@ return (new Config())
             ->ignoreVCSIgnored(true)
             ->in([
                 __DIR__ . '/../../Classes',
-                __DIR__ . '/../../Core12',
                 __DIR__ . '/../../Core13',
                 __DIR__ . '/../../Configuration',
                 __DIR__ . '/../../Tests',

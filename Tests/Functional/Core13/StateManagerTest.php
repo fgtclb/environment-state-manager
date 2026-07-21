@@ -11,12 +11,10 @@ use FGTCLB\EnvironmentStateManager\EnvironmentBuilderFactoryInterface;
 use FGTCLB\EnvironmentStateManager\StateInterface;
 use FGTCLB\EnvironmentStateManager\StateManagerInterface;
 use FGTCLB\EnvironmentStateManager\Tests\Functional\AbstractStateManagerTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-#[Group('not-core-12')]
 final class StateManagerTest extends AbstractStateManagerTestCase
 {
     protected function stateClass(): string
