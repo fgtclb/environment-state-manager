@@ -37,8 +37,11 @@ use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use TYPO3\CMS\Frontend\Cache\CacheInstruction;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\ContentObject\RegisterStack;
 use TYPO3\CMS\Frontend\Page\PageInformation;
 use TYPO3\CMS\Frontend\Page\PageInformationFactory;
+use TYPO3\CMS\Frontend\Page\PageParts;
+use TYPO3\CMS\Frontend\Response\ResponseData;
 
 /**
  * Environment builder for TYPO3 v14.
@@ -146,10 +149,23 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         // Prepare the remaining request attributes.
         $cacheInstruction = new CacheInstruction();
         $request = $request->withAttribute('frontend.cache.instruction', $cacheInstruction);
+        // The response data collector lets content elements register HTTP header data. On TYPO3 v13
+        // this lived on the TypoScriptFrontendController; TYPO3 v14 models it as a request attribute,
+        // created by the `PrepareTypoScriptFrontendRendering` middleware which this builder mirrors.
+        $request = $request->withAttribute('frontend.response.data', new ResponseData());
         $pageArguments = new PageArguments($pageId, '0', []);
         $request = $request->withAttribute('routing', $pageArguments);
         $pageInformation = $this->pageInformationFactory->create($request);
         $request = $request->withAttribute('frontend.page.information', $pageInformation);
+        // The register stack (TypoScript LOAD_REGISTER/RESTORE_REGISTER, `register:` getData) and the
+        // page parts (page title, last-changed, content) are request attributes on TYPO3 v14, created
+        // by the `PrepareTypoScriptFrontendRendering` middleware. The ContentObjectRenderer created
+        // below reads the register stack, so both must exist on the built request.
+        $request = $request->withAttribute('frontend.register.stack', new RegisterStack());
+        $pageRecord = $pageInformation->getPageRecord();
+        $pageParts = new PageParts();
+        $pageParts->setLastChanged(max((int)($pageRecord['tstamp'] ?? 0), (int)($pageRecord['SYS_LASTCHANGED'] ?? 0)));
+        $request = $request->withAttribute('frontend.page.parts', $pageParts);
         $expressionMatcherVariables = $this->getExpressionMatcherVariables($site, $request, $pageInformation, $siteLanguage);
         $frontendTypoScript = $this->frontendTypoScriptFactory->createSettingsAndSetupConditions(
             $site,

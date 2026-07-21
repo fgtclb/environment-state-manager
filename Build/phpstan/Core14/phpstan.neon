@@ -20,5 +20,14 @@ parameters:
     - ../../../Configuration
     - ../../../Tests
 
+  # TYPO3 v14 request attributes not (yet) known to saschaegerer/phpstan-typo3.
+  # They are created by the frontend environment builder, mirroring the
+  # `PrepareTypoScriptFrontendRendering` middleware.
+  typo3:
+    requestGetAttributeMapping:
+      frontend.response.data: TYPO3\CMS\Frontend\Response\ResponseData
+      frontend.register.stack: TYPO3\CMS\Frontend\ContentObject\RegisterStack
+      frontend.page.parts: TYPO3\CMS\Frontend\Page\PageParts
+
   excludePaths:
     - ../../../Tests/*/Core13/*
