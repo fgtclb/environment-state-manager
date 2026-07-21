@@ -75,12 +75,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.0.x-dev"
+            "dev-main": "2.0.x-dev"
         },
         "typo3/cms": {
             "extension-key": "environment_state_manager",
             "web-dir": ".Build/Web",
-            "version": "1.0.1-dev"
+            "version": "2.0.0-dev"
         }
     },
     "support": {
