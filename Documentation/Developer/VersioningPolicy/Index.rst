@@ -10,7 +10,7 @@ This extension follows a predictable release and deprecation process so that
 depending extensions know what to expect across releases.
 
 Semantic versioning
-====================
+===================
 
 Releases follow `semantic versioning <https://semver.org/>`__ (``MAJOR.MINOR.PATCH``)
 applied to the :ref:`public API <developer-public-api>`:
@@ -25,7 +25,7 @@ Only the public API is covered by this promise. Internal implementation details
 (see :ref:`developer-public-api`) may change in any release.
 
 Deprecations and breaking changes
-==================================
+=================================
 
 Functionality that is going to be removed is deprecated first whenever a
 backward-compatible path can be provided:

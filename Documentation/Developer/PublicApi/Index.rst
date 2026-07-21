@@ -2,9 +2,9 @@
 
 ..  _developer-public-api:
 
-=========================
+========================
 Public API and stability
-=========================
+========================
 
 This extension was extracted from another extension to provide a stable,
 reusable API that other extensions can build on and rely on. To keep that
