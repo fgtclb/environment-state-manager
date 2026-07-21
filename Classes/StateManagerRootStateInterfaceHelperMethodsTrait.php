@@ -71,11 +71,7 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         $superGlobals = $state->additionalData('_SERVER');
         foreach (ServerEnvironmentVariables::NAMES as $var) {
             if (!is_array($superGlobals)) {
-                if (!is_array($_SERVER)) {
-                    // No super globals wanted for the environment and the super global does not exist, so skip it.
-                    continue;
-                }
-                // No super globals wanted for the environment but the super global exists, so remove the unset variable.
+                // No super globals wanted for the environment, so remove the unset variable.
                 unset($_SERVER[$var]);
                 continue;
             }
@@ -117,12 +113,10 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         $applicationType = $request !== null && $request->getAttribute('applicationType') ?: null;
         $pageRenderer = $request !== null && $applicationType !== null ? GeneralUtility::makeInstance(PageRenderer::class) : null;
         $superGlobals = [];
-        if (is_array($_SERVER)) {
-            foreach (ServerEnvironmentVariables::NAMES as $var) {
-                if (array_key_exists($var, $_SERVER)) {
-                    $superGlobals['_SERVER'] ??= [];
-                    $superGlobals['_SERVER'][$var] = $_SERVER[$var];
-                }
+        foreach (ServerEnvironmentVariables::NAMES as $var) {
+            if (array_key_exists($var, $_SERVER)) {
+                $superGlobals['_SERVER'] ??= [];
+                $superGlobals['_SERVER'][$var] = $_SERVER[$var];
             }
         }
         /** @var LanguageService|null $languageService */

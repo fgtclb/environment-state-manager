@@ -35,6 +35,7 @@ use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use TYPO3\CMS\Frontend\Cache\CacheInstruction;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Page\PageInformation;
 use TYPO3\CMS\Frontend\Page\PageInformationFactory;
 
 /**
@@ -150,7 +151,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         // Bootstrap TypoScriptFrontendController
         $controller = GeneralUtility::makeInstance(TypoScriptFrontendController::class);
         $request = $request->withAttribute('frontend.controller', $controller);
-        $expressionMatcherVariables = $this->getExpressionMatcherVariables($site, $request, $controller);
+        $expressionMatcherVariables = $this->getExpressionMatcherVariables($site, $request, $controller, $pageInformation, $siteLanguage);
         $frontendTypoScript = $this->frontendTypoScriptFactory->createSettingsAndSetupConditions(
             $site,
             $pageInformation->getSysTemplateRows(),
@@ -241,9 +242,13 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
      *     tsfe: TypoScriptFrontendController,
      * }
      */
-    private function getExpressionMatcherVariables(SiteInterface $site, ServerRequestInterface $request, TypoScriptFrontendController $controller): array
-    {
-        $pageInformation = $request->getAttribute('frontend.page.information');
+    private function getExpressionMatcherVariables(
+        SiteInterface $site,
+        ServerRequestInterface $request,
+        TypoScriptFrontendController $controller,
+        PageInformation $pageInformation,
+        SiteLanguage $siteLanguage,
+    ): array {
         $topDownRootLine = $pageInformation->getRootLine();
         $localRootline = $pageInformation->getLocalRootLine();
         ksort($topDownRootLine);
@@ -254,7 +259,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             'fullRootLine' => $topDownRootLine,
             'localRootLine' => $localRootline,
             'site' => $site,
-            'siteLanguage' => $request->getAttribute('language'),
+            'siteLanguage' => $siteLanguage,
             'tsfe' => $controller,
         ];
     }
