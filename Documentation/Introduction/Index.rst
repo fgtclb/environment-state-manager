@@ -28,7 +28,7 @@ Features
 ========
 
 *   :php:`EnvironmentBuilderFactory` returning a TYPO3 core version compatible
-    environment builder for TYPO3 v12 and v13. A :php:`FrontendEnvironmentBuilder`
+    environment builder for TYPO3 v13. A :php:`FrontendEnvironmentBuilder`
     and a :php:`BackendEnvironmentBuilder` are shipped.
 *   :php:`StateManager` to build, apply and restore an environment state.
 *   :php:`StateApplyEvent` and :php:`StateBackupEvent` PSR-14 events dispatched
@@ -45,6 +45,10 @@ Compatibility
         -   TYPO3
         -   PHP
     *   -   main
+        -   2.x
+        -   v13
+        -   8.2 - 8.5
+    *   -   1
         -   1.x
         -   v12 / v13
         -   8.1 - 8.5

@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Information\Typo3Version;
 
-const TYPO3_LOWEST_SUPPORTED_MAJOR_VERSION = 12;
+const TYPO3_LOWEST_SUPPORTED_MAJOR_VERSION = 13;
 const TYPO3_HIGHEST_SUPPORTED_MAJOR_VERSION = 13;
 
 trait ExtensionCoreVersionCompatTestsTrait
@@ -34,14 +34,19 @@ trait ExtensionCoreVersionCompatTestsTrait
     }
 
     /**
+     * Note that the lowest and highest supported major version are identical as long as only one
+     * TYPO3 major version is supported, which makes the version specific tests above excluded by
+     * their `not-core-*` group for every supported version. They become effective again as soon as
+     * a second major version is added.
+     *
      * @return array<int, int>
      */
     private function getAllowedMajorVersions(): array
     {
-        return [
+        return array_values(array_unique([
             $this->getLowestSupportedTYPO3MajorVersion(),
             $this->getHighestSupportedTYPO3MajorVersion(),
-        ];
+        ]));
     }
 
     private function getLowestSupportedTYPO3MajorVersion(): int

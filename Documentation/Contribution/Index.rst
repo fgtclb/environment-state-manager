@@ -29,19 +29,18 @@ wrapper installs them for a specific TYPO3 core and PHP version:
 
 ..  code-block:: bash
 
-    # Install dependencies for TYPO3 v12 on PHP 8.2 (default matrix).
-    Build/Scripts/runTests.sh -t 12 -p 8.2 -s composerUpdate
-
-    # Switch the working copy to the TYPO3 v13 dependency set.
+    # Install dependencies for TYPO3 v13 on PHP 8.2 (default matrix).
     Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
 
 ..  note::
 
-    The ``-t`` option only influences what ``composerInstall`` /
-    ``composerUpdate`` installs. To run the test suites against TYPO3 v13 you
-    must run ``composerUpdate -t 13`` **first**; afterwards pass ``-t 13`` to the
-    suite as well. ``composerUpdate`` removes and reinstalls :file:`.Build/` and
-    :file:`composer.lock` (both git-ignored).
+    Only ``composerUpdate`` installs the dependencies for the core version
+    given with ``-t``, ``composerInstall`` does not. To run a test suite against
+    a specific TYPO3 core version, run ``composerUpdate -t <version>``
+    **first** and pass the same ``-t <version>`` to the suite afterwards.
+    Suites executed with a different core version installed than selected report
+    false positives. ``composerUpdate`` removes and reinstalls :file:`.Build/`
+    and :file:`composer.lock` (both git-ignored).
 
 Run ``Build/Scripts/runTests.sh -h`` to see all options.
 
@@ -71,10 +70,11 @@ phpunit flags must follow ``--``):
 
     Build/Scripts/runTests.sh -s functional -d sqlite -- --filter EnvironmentBuilderFactoryTest
 
-The functional :file:`Tests/Functional/Core12/` and
-:file:`Tests/Functional/Core13/` directories are gated with phpunit groups
-(``not-core-12`` / ``not-core-13``), so the wrapper automatically runs the set
-matching the installed core version.
+The functional :file:`Tests/Functional/Core13/` directory holds the TYPO3 core
+version specific tests. They are gated with phpunit groups
+(``not-core-<version>``) as soon as more than one TYPO3 major version is
+supported, so the wrapper automatically runs the set matching the installed
+core version.
 
 ..  _contribution-quality:
 
