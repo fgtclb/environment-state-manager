@@ -100,15 +100,12 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         }
         // Provide the active request to the Extbase ConfigurationManager. This only depends on the
         // request, not on a ContentObjectRenderer, so it runs whenever a request exists (frontend
-        // and backend). The TYPO3 v12 ContentObjectRenderer wiring (`setContentObject()`) is bound to
-        // the TypoScriptFrontendController and therefore handled by the version-specific state
-        // managers through the `ExtendedStateInterface` hook.
+        // and backend). The ContentObjectRenderer wiring is bound to the TypoScriptFrontendController
+        // and therefore handled by the version-specific state managers through the
+        // `ExtendedStateInterface` hook.
         if ($state->request() !== null) {
             $configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
-            if (method_exists($configurationManager, 'setRequest')) {
-                // TYPO3 v13
-                $configurationManager->setRequest($state->request());
-            }
+            $configurationManager->setRequest($state->request());
         }
     }
 
