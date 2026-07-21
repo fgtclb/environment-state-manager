@@ -65,7 +65,7 @@ and restores the previous environment afterwards – even if the closure throws:
     });
 
 Manual backup, bootstrap and restore
-=====================================
+====================================
 
 If you need finer control, the individual steps are available as well. Always
 make sure to restore a previously created backup, for example by using a
