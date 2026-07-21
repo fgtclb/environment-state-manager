@@ -16,9 +16,9 @@ parameters:
 
   paths:
     - ../../../Classes
-    - ../../../Core13
+    - ../../../Core14
     - ../../../Configuration
     - ../../../Tests
 
   excludePaths:
-    - ../../../Tests/*/Core14/*
+    - ../../../Tests/*/Core13/*

@@ -42,26 +42,27 @@ The following types form the public API. Depend on these interfaces and types:
             :php:`FGTCLB\EnvironmentStateManager\Exception\SiteConfigCouldNotBeDetermined`
         -   Exceptions thrown by the API.
 
-The TYPO3 core-version specific :php:`Core13\ExtendedStateInterface` extends
-:php:`StateInterface` and is part
-of the public API as well. They carry the version-specific parts of the state
-contract: the :php:`TypoScriptFrontendController` accessors
+The TYPO3 v13 specific :php:`Core13\ExtendedStateInterface` extends
+:php:`StateInterface` and is part of the public API as well. It carries the
+version-specific part of the state contract: the
+:php:`TypoScriptFrontendController` accessors
 (:php:`withTypoScriptFrontendController()` and
 :php:`typoScriptFrontendController()`) are declared here, and not on the
 version-agnostic :php:`StateInterface`, because the
 :php:`TypoScriptFrontendController` is deprecated in TYPO3 v13 and removed in
-TYPO3 v14. Type-hint the version-agnostic :php:`StateInterface` in code that
-should work across core versions, and only reference an
-:php:`ExtendedStateInterface` when you explicitly target a specific TYPO3 core
-version.
+TYPO3 v14. TYPO3 v14 has no extended state interface. Type-hint the
+version-agnostic :php:`StateInterface` in code that should work across core
+versions, and only reference :php:`Core13\ExtendedStateInterface` when you
+explicitly target TYPO3 v13 specific state.
 
 Internal implementation details
 ===============================
 
 The concrete, TYPO3 core-version specific implementations under the
-:php:`FGTCLB\EnvironmentStateManager\Core13` namespace – for example
-:php:`Core13\StateManager`, :php:`Core13\FrontendEnvironmentBuilder` and
-:php:`Core13\State` – as well as the :php:`EnvironmentBuilderFactory` and the
+:php:`FGTCLB\EnvironmentStateManager\Core13` and
+:php:`FGTCLB\EnvironmentStateManager\Core14` namespaces – for example
+:php:`Core13\StateManager`, :php:`Core14\FrontendEnvironmentBuilder` and
+:php:`Core14\State` – as well as the :php:`EnvironmentBuilderFactory` and the
 internal traits are marked :php:`@internal`. They are registered as dependency
 injection services and resolved to the implementation matching the running
 TYPO3 core version.

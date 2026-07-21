@@ -22,17 +22,16 @@ use TYPO3\CMS\Core\EventDispatcher\ListenerProvider;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Shared functional test body for the version-specific state managers.
  *
  * The backup/restore/stack mechanics and the request/backend-user/event expectations are identical
  * across TYPO3 core versions and live here. The few TYPO3 core-version specific concerns - the
- * concrete `State`/`StateManager` classes, the TypoScriptFrontendController accessors on the extended
- * state, and which context aspect the running core seeds on a backed-up state - are delegated to the
- * abstract hooks the thin `CoreNN` subclasses implement.
+ * concrete `State`/`StateManager` classes, the version-specific state a core version keeps in
+ * `$GLOBALS` (the TypoScriptFrontendController on TYPO3 v13, nothing on TYPO3 v14), and which
+ * context aspect the running core seeds on a backed-up state - are delegated to the abstract hooks
+ * the thin `CoreNN` subclasses implement.
  */
 abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateManagerTestCase
 {
@@ -42,13 +41,16 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
     abstract protected function stateClass(): string;
 
     /**
-     * @return class-string
+     * The version-specific extended state interface, or null when the running TYPO3 core version
+     * carries no version-specific state (TYPO3 v14 and above).
+     *
+     * @return class-string|null
      */
-    abstract protected function extendedStateInterfaceClass(): string;
+    abstract protected function extendedStateInterfaceClass(): ?string;
 
     abstract protected function createState(
         ?ServerRequestInterface $request = null,
-        ?TypoScriptFrontendController $typoScriptFrontendController = null,
+        ?object $versionSpecificState = null,
         ?BackendUserAuthentication $backendUserAuthentication = null,
     ): StateInterface;
 
@@ -57,9 +59,20 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
     ): StateManagerInterface;
 
     /**
-     * Read the TypoScriptFrontendController back from the version-specific extended state.
+     * The `$GLOBALS` key holding version-specific state, or null when there is none. TYPO3 v13 keeps
+     * the TypoScriptFrontendController in `$GLOBALS['TSFE']`; TYPO3 v14 removed it.
      */
-    abstract protected function readTypoScriptFrontendController(StateInterface $state): ?TypoScriptFrontendController;
+    abstract protected function versionSpecificGlobalKey(): ?string;
+
+    /**
+     * Creates the object stored under {@see versionSpecificGlobalKey()}, or null when there is none.
+     */
+    abstract protected function createVersionSpecificGlobal(): ?object;
+
+    /**
+     * Read the version-specific state back from a state instance, or null when there is none.
+     */
+    abstract protected function readVersionSpecificState(StateInterface $state): ?object;
 
     /**
      * Assert the context a freshly backed-up state carries on the running TYPO3 core version.
@@ -67,16 +80,69 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
     abstract protected function assertBackedUpStateContext(StateInterface $state): void;
 
     /**
-     * The version-specific error code bootstrap() raises when a builder returns a non-extended state.
+     * The version-specific global used by the restore test, which may need more setup than a plain
+     * mock. Defaults to {@see createVersionSpecificGlobal()}.
      */
-    abstract protected function nonExtendedStateExceptionCode(): int;
+    protected function createVersionSpecificGlobalForRestore(): ?object
+    {
+        return $this->createVersionSpecificGlobal();
+    }
+
+    /**
+     * Helpers keeping the version-specific global handling out of the shared test bodies.
+     */
+    final protected function setVersionSpecificGlobal(?object $value): void
+    {
+        $key = $this->versionSpecificGlobalKey();
+        if ($key === null) {
+            return;
+        }
+        if ($value === null) {
+            unset($GLOBALS[$key]);
+            return;
+        }
+        $GLOBALS[$key] = $value;
+    }
+
+    final protected function assertVersionSpecificGlobalSame(?object $expected): void
+    {
+        $key = $this->versionSpecificGlobalKey();
+        if ($key === null) {
+            return;
+        }
+        $this->assertSame($expected, $GLOBALS[$key] ?? null);
+    }
+
+    final protected function assertVersionSpecificGlobalNotSet(): void
+    {
+        $key = $this->versionSpecificGlobalKey();
+        if ($key === null) {
+            return;
+        }
+        $this->assertArrayNotHasKey($key, $GLOBALS);
+    }
+
+    final protected function assertStateInstanceOfExtendedInterface(StateInterface $state): void
+    {
+        $extendedStateInterfaceClass = $this->extendedStateInterfaceClass();
+        if ($extendedStateInterfaceClass === null) {
+            return;
+        }
+        $this->assertInstanceOf($extendedStateInterfaceClass, $state);
+    }
+
+    final protected function assertVersionSpecificStateSame(StateInterface $state, ?object $expected): void
+    {
+        if ($this->versionSpecificGlobalKey() === null) {
+            return;
+        }
+        $this->assertSame($expected, $this->readVersionSpecificState($state));
+    }
 
     protected function tearDown(): void
     {
-        unset(
-            $GLOBALS['TYPO3_REQUEST'],
-            $GLOBALS['TSFE'],
-        );
+        unset($GLOBALS['TYPO3_REQUEST']);
+        $this->setVersionSpecificGlobal(null);
         parent::tearDown();
     }
 
@@ -86,16 +152,16 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $dispatchedBackupEvents = [];
         $this->interceptBackupEvents($dispatchedBackupEvents);
         $requestMock = $this->createMock(ServerRequestInterface::class);
-        $typoScriptFrontendControllerMock = $this->createMock(TypoScriptFrontendController::class);
+        $versionSpecificGlobal = $this->createVersionSpecificGlobal();
         $backendUserAuthenticationMock = $this->createMock(BackendUserAuthentication::class);
         $GLOBALS['TYPO3_REQUEST'] = $requestMock;
-        $GLOBALS['TSFE'] = $typoScriptFrontendControllerMock;
+        $this->setVersionSpecificGlobal($versionSpecificGlobal);
         $GLOBALS['BE_USER'] = $backendUserAuthenticationMock;
         $stateManager = $this->createStateManager();
         // before
         $this->assertCount(0, $this->readStack($stateManager));
         $this->assertSame($requestMock, $GLOBALS['TYPO3_REQUEST']);
-        $this->assertSame($typoScriptFrontendControllerMock, $GLOBALS['TSFE']);
+        $this->assertVersionSpecificGlobalSame($versionSpecificGlobal);
         $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER']);
         // execution
         $stateManager->backup();
@@ -105,15 +171,14 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $this->assertArrayHasKey(0, $stack);
         $firstState = $stack[0];
         $this->assertInstanceOf(StateInterface::class, $firstState);
-        $this->assertInstanceOf($this->extendedStateInterfaceClass(), $firstState);
+        $this->assertStateInstanceOfExtendedInterface($firstState);
         $this->assertInstanceOf($this->stateClass(), $firstState);
         $this->assertIsObject($firstState->request());
-        $this->assertIsObject($this->readTypoScriptFrontendController($firstState));
         $this->assertIsObject($firstState->context());
         $this->assertBackedUpStateContext($firstState);
         $this->assertIsObject($firstState->backendUserAuthentication());
         $this->assertSame($requestMock, $firstState->request());
-        $this->assertSame($typoScriptFrontendControllerMock, $this->readTypoScriptFrontendController($firstState));
+        $this->assertVersionSpecificStateSame($firstState, $versionSpecificGlobal);
         $this->assertSame($backendUserAuthenticationMock, $firstState->backendUserAuthentication());
         // assert event count
         $this->assertCount(1, $dispatchedBackupEvents);
@@ -125,22 +190,22 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $dispatchedBackupEvents = [];
         $this->interceptBackupEvents($dispatchedBackupEvents);
         $requestMock = $this->createMock(ServerRequestInterface::class);
-        $typoScriptFrontendControllerMock = $this->createMock(TypoScriptFrontendController::class);
+        $versionSpecificGlobal = $this->createVersionSpecificGlobal();
         $backendUserAuthenticationMock = $this->createMock(BackendUserAuthentication::class);
         $stateManager = $this->createStateManager();
         // before
         $this->assertCount(0, $this->readStack($stateManager));
         $this->assertNull($GLOBALS['TYPO3_REQUEST'] ?? null);
-        $this->assertNull($GLOBALS['TSFE'] ?? null);
+        $this->assertVersionSpecificGlobalSame(null);
         $this->assertNull($GLOBALS['BE_USER'] ?? null);
         // backup 1
         $stateManager->backup();
         // change environment
         $GLOBALS['TYPO3_REQUEST'] = $requestMock;
-        $GLOBALS['TSFE'] = $typoScriptFrontendControllerMock;
+        $this->setVersionSpecificGlobal($versionSpecificGlobal);
         $GLOBALS['BE_USER'] = $backendUserAuthenticationMock;
         $this->assertSame($requestMock, $GLOBALS['TYPO3_REQUEST']);
-        $this->assertSame($typoScriptFrontendControllerMock, $GLOBALS['TSFE']);
+        $this->assertVersionSpecificGlobalSame($versionSpecificGlobal);
         $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER']);
         // backup 2
         $stateManager->backup();
@@ -151,17 +216,17 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $this->assertArrayHasKey(1, $stack);
         $firstState = $stack[0];
         $this->assertInstanceOf(StateInterface::class, $firstState);
-        $this->assertInstanceOf($this->extendedStateInterfaceClass(), $firstState);
+        $this->assertStateInstanceOfExtendedInterface($firstState);
         $this->assertInstanceOf($this->stateClass(), $firstState);
         $this->assertNull($firstState->request());
-        $this->assertNull($this->readTypoScriptFrontendController($firstState));
+        $this->assertVersionSpecificStateSame($firstState, null);
         $this->assertNull($firstState->backendUserAuthentication());
         $secondState = $stack[1];
         $this->assertInstanceOf(StateInterface::class, $secondState);
-        $this->assertInstanceOf($this->extendedStateInterfaceClass(), $secondState);
+        $this->assertStateInstanceOfExtendedInterface($secondState);
         $this->assertInstanceOf($this->stateClass(), $secondState);
         $this->assertSame($requestMock, $secondState->request());
-        $this->assertSame($typoScriptFrontendControllerMock, $this->readTypoScriptFrontendController($secondState));
+        $this->assertVersionSpecificStateSame($secondState, $versionSpecificGlobal);
         $this->assertSame($backendUserAuthenticationMock, $secondState->backendUserAuthentication());
         // assert event count
         $this->assertCount(2, $dispatchedBackupEvents);
@@ -174,13 +239,11 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $this->interceptApplyEvents($dispatchedApplyEvents);
         $request = new ServerRequest();
         $request = $request->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE);
-        $typoScriptFrontendControllerMock = $this->createMock(TypoScriptFrontendController::class);
-        $cObj = GeneralUtility::makeInstance(ContentObjectRenderer::class, $typoScriptFrontendControllerMock);
-        $typoScriptFrontendControllerMock->cObj = $cObj;
+        $versionSpecificGlobal = $this->createVersionSpecificGlobalForRestore();
         $backendUserAuthenticationMock = $this->createMock(BackendUserAuthentication::class);
         $expectedState = $this->createState(
             request: $request,
-            typoScriptFrontendController: $typoScriptFrontendControllerMock,
+            versionSpecificState: $versionSpecificGlobal,
             backendUserAuthentication: $backendUserAuthenticationMock,
         );
         $stateManager = $this->createStateManager();
@@ -189,7 +252,7 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $context = GeneralUtility::makeInstance(Context::class);
         $this->assertCount(1, $this->readStack($stateManager));
         $this->assertNull($GLOBALS['TYPO3_REQUEST'] ?? null);
-        $this->assertNull($GLOBALS['TSFE'] ?? null);
+        $this->assertVersionSpecificGlobalSame(null);
         $this->assertNull($GLOBALS['BE_USER'] ?? null);
         // Applying a frontend-request state seeds a fresh preview aspect (version-agnostic, handled in
         // the shared helper trait), so it must not be present yet.
@@ -199,8 +262,7 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         // after
         // @phpstan-ignore-next-line PHPStan cannot track that restore() repopulated the superglobal.
         $this->assertSame($request, $GLOBALS['TYPO3_REQUEST'] ?? null);
-        // @phpstan-ignore-next-line PHPStan cannot track that restore() repopulated the superglobal.
-        $this->assertSame($typoScriptFrontendControllerMock, $GLOBALS['TSFE'] ?? null);
+        $this->assertVersionSpecificGlobalSame($versionSpecificGlobal);
         // @phpstan-ignore-next-line PHPStan cannot track that restore() repopulated the superglobal.
         $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER'] ?? null);
         $this->assertTrue($context->hasAspect('frontend.preview'));
@@ -209,8 +271,7 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $stateManager->restore();
         // @phpstan-ignore-next-line PHPStan cannot track that restore() cleared the superglobal.
         $this->assertNull($GLOBALS['TYPO3_REQUEST'] ?? null);
-        // @phpstan-ignore-next-line PHPStan cannot track that restore() cleared the superglobal.
-        $this->assertNull($GLOBALS['TSFE'] ?? null);
+        $this->assertVersionSpecificGlobalSame(null);
         // @phpstan-ignore-next-line PHPStan cannot track that restore() cleared the superglobal.
         $this->assertNull($GLOBALS['BE_USER'] ?? null);
         $this->assertFalse($context->hasAspect('frontend.preview'));
@@ -224,31 +285,17 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $dispatchedApplyEvents = [];
         $this->interceptApplyEvents($dispatchedApplyEvents);
         $GLOBALS['TYPO3_REQUEST'] = $this->createMock(ServerRequestInterface::class);
-        $GLOBALS['TSFE'] = $this->createMock(TypoScriptFrontendController::class);
+        $this->setVersionSpecificGlobal($this->createVersionSpecificGlobal());
         $GLOBALS['BE_USER'] = $this->createMock(BackendUserAuthentication::class);
         $stateManager = $this->createStateManager();
         // execution
         $stateManager->reset();
         // after - the empty state cleared every managed global ...
         $this->assertArrayNotHasKey('TYPO3_REQUEST', $GLOBALS);
-        $this->assertArrayNotHasKey('TSFE', $GLOBALS);
+        $this->assertVersionSpecificGlobalNotSet();
         $this->assertArrayNotHasKey('BE_USER', $GLOBALS);
         // ... and an apply event was dispatched.
         $this->assertCount(1, $dispatchedApplyEvents);
-    }
-
-    #[Test]
-    public function bootstrapThrowsWhenBuilderReturnsNonExtendedState(): void
-    {
-        $nonExtendedState = $this->createMock(StateInterface::class);
-        $environmentBuilderMock = $this->createEnvironmentBuilderMock();
-        $environmentBuilderMock->method('build')->willReturn($nonExtendedState);
-        $stateManager = $this->createStateManager($this->createEnvironmentBuilderFactoryMock($environmentBuilderMock));
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode($this->nonExtendedStateExceptionCode());
-
-        $stateManager->bootstrap(new StateBuildContext(applicationType: ApplicationType::FRONTEND));
     }
 
     /**

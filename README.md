@@ -1,5 +1,6 @@
 [![Latest Stable Version](https://poser.pugx.org/fgtclb/environment-state-manager/v/stable.svg?style=for-the-badge)](https://packagist.org/packages/fgtclb/environment-state-manager)
 [![License](https://poser.pugx.org/fgtclb/environment-state-manager/license?style=for-the-badge)](https://packagist.org/packages/fgtclb/environment-state-manager)
+[![TYPO3 14.3](https://img.shields.io/badge/TYPO3-14.3-green.svg?style=for-the-badge)](https://get.typo3.org/version/14.3)
 [![TYPO3 13.4](https://img.shields.io/badge/TYPO3-13.4-green.svg?style=for-the-badge)](https://get.typo3.org/version/13.4)
 [![Total Downloads](https://poser.pugx.org/fgtclb/environment-state-manager/downloads.svg?style=for-the-badge)](https://packagist.org/packages/fgtclb/environment-state-manager)
 [![Monthly Downloads](https://poser.pugx.org/fgtclb/environment-state-manager/d/monthly?style=for-the-badge)](https://packagist.org/packages/fgtclb/environment-state-manager)
@@ -42,7 +43,7 @@ and also within functional tests to properly build the more global state.
 ## Features
 
 * `EnvironmentBuilderFactory` returning a TYPO3 core version compatible
-  environment builder (TYPO3 v13). A `FrontendEnvironmentBuilder` and a
+  environment builder (TYPO3 v13 and v14). A `FrontendEnvironmentBuilder` and a
   `BackendEnvironmentBuilder` are shipped.
 * `StateManager` to build, apply and restore an environment state, emitting
   `StateApplyEvent` and `StateBackupEvent` PSR-14 events.
@@ -51,7 +52,7 @@ and also within functional tests to properly build the more global state.
 
 | Branch | State            | Extension | TYPO3     | PHP       |
 |--------|------------------|-----------|-----------|-----------|
-| main   | active support   | 2.x       | v13       | 8.2 – 8.5 |
+| main   | active support   | 2.x       | v13 / v14 | 8.2 – 8.5 |
 | 1      | maintenance      | 1.x       | v12 / v13 | 8.1 – 8.5 |
 
 ## Installation
@@ -114,9 +115,9 @@ Adding the `Makefile` will be declined due to our own policies.
   `Tests/Functional/EnvironmentBuilderFactoryTest.php` cover the
   `EnvironmentBuilderFactory`, including the TYPO3 core version specific
   service resolution.
-* `Tests/Functional/Core13` holds the `StateManager` functional tests. They are
-  gated per TYPO3 version through the `not-core-<version>` PHPUnit groups as
-  soon as more than one TYPO3 major version is supported.
+* `Tests/Functional/Core13` and `Tests/Functional/Core14` hold the
+  `StateManager` functional tests, gated per TYPO3 version through the
+  `not-core-13` / `not-core-14` PHPUnit groups.
 
 ### Adopted tests
 
@@ -129,7 +130,7 @@ adopted into this repository under
 
 * `Tests/Unit/VersionCompatTest.php` and `Tests/Functional/VersionCompatTest.php`
   use `ExtensionCoreVersionCompatTestsTrait` to assert the supported TYPO3 v13
-  major version, as a unit and a functional test respectively.
+  and v14 major versions, as a unit and a functional test respectively.
 * `Tests/Functional/ExtensionLoadedTest.php` uses `ExtensionsLoadedTestsTrait`
   to verify the extension is registered both by its composer package name
   (`fgtclb/environment-state-manager`) and its extension key

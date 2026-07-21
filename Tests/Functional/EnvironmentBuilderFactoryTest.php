@@ -6,9 +6,12 @@ namespace FGTCLB\EnvironmentStateManager\Tests\Functional;
 
 use FGTCLB\EnvironmentStateManager\Core13\BackendEnvironmentBuilder as Core13BackendEnvironmentBuilder;
 use FGTCLB\EnvironmentStateManager\Core13\FrontendEnvironmentBuilder as Core13FrontendEnvironmentBuilder;
+use FGTCLB\EnvironmentStateManager\Core14\BackendEnvironmentBuilder as Core14BackendEnvironmentBuilder;
+use FGTCLB\EnvironmentStateManager\Core14\FrontendEnvironmentBuilder as Core14FrontendEnvironmentBuilder;
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderFactory;
 use FGTCLB\EnvironmentStateManager\EnvironmentBuilderFactoryInterface;
 use FGTCLB\EnvironmentStateManager\StateBuildContext;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -31,6 +34,7 @@ final class EnvironmentBuilderFactoryTest extends AbstractEnvironmentStateManage
         $this->assertInstanceOf(EnvironmentBuilderFactory::class, $factory);
     }
 
+    #[Group('not-core-14')]
     #[Test]
     public function createReturnsTypoV13FrontendEnvironmentBuilderInstance(): void
     {
@@ -43,6 +47,7 @@ final class EnvironmentBuilderFactoryTest extends AbstractEnvironmentStateManage
         $this->assertInstanceOf(Core13FrontendEnvironmentBuilder::class, $builder);
     }
 
+    #[Group('not-core-14')]
     #[Test]
     public function createReturnsTypoV13BackendEnvironmentBuilderInstance(): void
     {
@@ -53,5 +58,31 @@ final class EnvironmentBuilderFactoryTest extends AbstractEnvironmentStateManage
         );
         $builder = GeneralUtility::makeInstance(EnvironmentBuilderFactory::class)->create($stateBuildContext);
         $this->assertInstanceOf(Core13BackendEnvironmentBuilder::class, $builder);
+    }
+
+    #[Group('not-core-13')]
+    #[Test]
+    public function createReturnsTypoV14FrontendEnvironmentBuilderInstance(): void
+    {
+        $stateBuildContext = new StateBuildContext(
+            applicationType: ApplicationType::FRONTEND,
+            pageId: null,
+            languageId: null,
+        );
+        $builder = GeneralUtility::makeInstance(EnvironmentBuilderFactory::class)->create($stateBuildContext);
+        $this->assertInstanceOf(Core14FrontendEnvironmentBuilder::class, $builder);
+    }
+
+    #[Group('not-core-13')]
+    #[Test]
+    public function createReturnsTypoV14BackendEnvironmentBuilderInstance(): void
+    {
+        $stateBuildContext = new StateBuildContext(
+            applicationType: ApplicationType::BACKEND,
+            pageId: null,
+            languageId: null,
+        );
+        $builder = GeneralUtility::makeInstance(EnvironmentBuilderFactory::class)->create($stateBuildContext);
+        $this->assertInstanceOf(Core14BackendEnvironmentBuilder::class, $builder);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\EnvironmentStateManager;
 
 use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound;
+use FGTCLB\EnvironmentStateManager\Exception\UnsupportedApplicationType;
 
 /**
  * Interface for environment builder factory implementations.
@@ -17,6 +18,7 @@ interface EnvironmentBuilderFactoryInterface
     /**
      * Creates an environment builder instance.
      * @throws NoTypo3VersionCompatibleEnvironmentBuilderFound
+     * @throws UnsupportedApplicationType
      */
     public function create(StateBuildContext $stateBuildContext): EnvironmentBuilderInterface;
 }

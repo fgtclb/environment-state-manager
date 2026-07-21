@@ -65,18 +65,21 @@ The returned :php:`StateInterface` holds the version-agnostic bootstrapped
 environment elements, for example the :php:`ServerRequestInterface`, the
 :php:`PageRenderer` and the :php:`Context`.
 
-TYPO3 core-version specific state lives on the matching
-:php:`Core13\ExtendedStateInterface`. In
-particular the :php:`TypoScriptFrontendController` accessors are declared there,
-because the :php:`TypoScriptFrontendController` is deprecated in TYPO3 v13 and
-removed in TYPO3 v14. Narrow the returned state to an :php:`ExtendedStateInterface`
-when you explicitly need that version-specific state.
+On TYPO3 v13, TYPO3 core-version specific state lives on the matching
+:php:`Core13\ExtendedStateInterface`. In particular the
+:php:`TypoScriptFrontendController` accessors are declared there, because the
+:php:`TypoScriptFrontendController` is deprecated in TYPO3 v13. Narrow the
+returned state to :php:`Core13\ExtendedStateInterface` when you explicitly need
+that TYPO3 v13 specific state. TYPO3 v14 removed the
+:php:`TypoScriptFrontendController` and therefore has no extended state
+interface: :php:`Core14\State` implements the version-agnostic
+:php:`StateInterface` directly.
 
 ..  note::
 
     Always type-hint the :php:`EnvironmentBuilderFactoryInterface`,
     :php:`EnvironmentBuilderInterface` and :php:`StateInterface`, never the
-    concrete :php:`Core13\*` classes. The dependency injection
+    concrete :php:`Core13\*` or :php:`Core14\*` classes. The dependency injection
     container resolves the implementation for the running TYPO3 core version. See
     :ref:`developer-public-api` for the full public API surface.
 
