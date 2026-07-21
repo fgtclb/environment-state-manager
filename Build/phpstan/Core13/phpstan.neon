@@ -1,7 +1,7 @@
 includes:
   - phpstan-baseline.neon
   - ../../../.Build/vendor/bnf/phpstan-psr-container/extension.neon
-  - ../../../.Build/vendor/friendsoftypo3/phpstan-typo3/extension.neon
+  - ../../../.Build/vendor/saschaegerer/phpstan-typo3/extension.neon
   - ../../../.Build/vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
@@ -9,6 +9,10 @@ parameters:
   tmpDir: ../../../.Build/.cache/phpstan
 
   level: 8
+
+  # Doc types must not be trusted 100%, especially for globals and test
+  # assertions verifying the runtime contract. Mirrors the TYPO3 core setting.
+  treatPhpDocTypesAsCertain: false
 
   paths:
     - ../../../Classes

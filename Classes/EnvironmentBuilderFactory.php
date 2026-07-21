@@ -40,7 +40,11 @@ final class EnvironmentBuilderFactory implements EnvironmentBuilderFactoryInterf
     ) {}
 
     /**
-     * @throws NoTypo3VersionCompatibleEnvironmentBuilderFound
+     * Note that this implementation does not throw
+     * {@see NoTypo3VersionCompatibleEnvironmentBuilderFound} itself: the builders are injected by
+     * the dependency injection container, which fails earlier when no `Core{major}/` folder matches
+     * the running TYPO3 version. The exception stays part of the interface contract for
+     * implementations resolving the builders lazily.
      */
     public function create(StateBuildContext $stateBuildContext): EnvironmentBuilderInterface
     {

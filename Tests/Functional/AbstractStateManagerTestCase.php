@@ -93,13 +93,10 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $GLOBALS['BE_USER'] = $backendUserAuthenticationMock;
         $stateManager = $this->createStateManager();
         // before
-        $this->assertIsObject($GLOBALS['TYPO3_REQUEST'] ?? null);
-        $this->assertIsObject($GLOBALS['TSFE'] ?? null);
-        $this->assertIsObject($GLOBALS['BE_USER'] ?? null);
         $this->assertCount(0, $this->readStack($stateManager));
-        $this->assertSame($requestMock, $GLOBALS['TYPO3_REQUEST'] ?? null);
-        $this->assertSame($typoScriptFrontendControllerMock, $GLOBALS['TSFE'] ?? null);
-        $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER'] ?? null);
+        $this->assertSame($requestMock, $GLOBALS['TYPO3_REQUEST']);
+        $this->assertSame($typoScriptFrontendControllerMock, $GLOBALS['TSFE']);
+        $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER']);
         // execution
         $stateManager->backup();
         // after
@@ -142,9 +139,9 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $GLOBALS['TYPO3_REQUEST'] = $requestMock;
         $GLOBALS['TSFE'] = $typoScriptFrontendControllerMock;
         $GLOBALS['BE_USER'] = $backendUserAuthenticationMock;
-        $this->assertSame($requestMock, $GLOBALS['TYPO3_REQUEST'] ?? null);
-        $this->assertSame($typoScriptFrontendControllerMock, $GLOBALS['TSFE'] ?? null);
-        $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER'] ?? null);
+        $this->assertSame($requestMock, $GLOBALS['TYPO3_REQUEST']);
+        $this->assertSame($typoScriptFrontendControllerMock, $GLOBALS['TSFE']);
+        $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER']);
         // backup 2
         $stateManager->backup();
         // after
@@ -210,8 +207,11 @@ abstract class AbstractStateManagerTestCase extends AbstractEnvironmentStateMana
         $this->assertCount(0, $this->readStack($stateManager));
         // restore on empty stack resets environment to empty state - expected !
         $stateManager->restore();
+        // @phpstan-ignore-next-line PHPStan cannot track that restore() cleared the superglobal.
         $this->assertNull($GLOBALS['TYPO3_REQUEST'] ?? null);
+        // @phpstan-ignore-next-line PHPStan cannot track that restore() cleared the superglobal.
         $this->assertNull($GLOBALS['TSFE'] ?? null);
+        // @phpstan-ignore-next-line PHPStan cannot track that restore() cleared the superglobal.
         $this->assertNull($GLOBALS['BE_USER'] ?? null);
         $this->assertFalse($context->hasAspect('frontend.preview'));
         // assert event count

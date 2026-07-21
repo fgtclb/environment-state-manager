@@ -20,6 +20,9 @@ final class PublicApiExceptionTest extends TestCase
     {
         $exception = new NoTypo3VersionCompatibleEnvironmentBuilderFound('no builder', 1762800000);
 
+        // Statically certain, but intentionally asserted: being a \RuntimeException is a public
+        // API promise consumers catch on, and must not silently change.
+        // @phpstan-ignore-next-line
         $this->assertInstanceOf(\RuntimeException::class, $exception);
         $this->assertSame('no builder', $exception->getMessage());
         $this->assertSame(1762800000, $exception->getCode());
@@ -30,6 +33,9 @@ final class PublicApiExceptionTest extends TestCase
     {
         $exception = new SiteConfigCouldNotBeDetermined('no site', 1762800001);
 
+        // Statically certain, but intentionally asserted: being a \RuntimeException is a public
+        // API promise consumers catch on, and must not silently change.
+        // @phpstan-ignore-next-line
         $this->assertInstanceOf(\RuntimeException::class, $exception);
         $this->assertSame('no site', $exception->getMessage());
         $this->assertSame(1762800001, $exception->getCode());
