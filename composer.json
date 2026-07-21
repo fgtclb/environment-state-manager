@@ -75,7 +75,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.0.x-dev"
+            "dev-1": "1.x-dev"
         },
         "typo3/cms": {
             "extension-key": "environment_state_manager",
