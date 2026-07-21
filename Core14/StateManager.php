@@ -1,0 +1,106 @@
+<?php
+
+declare(strict_types=1);
+
+namespace FGTCLB\EnvironmentStateManager\Core14;
+
+use FGTCLB\EnvironmentStateManager\EnvironmentBuilderFactoryInterface;
+use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound;
+use FGTCLB\EnvironmentStateManager\StateBuildContext;
+use FGTCLB\EnvironmentStateManager\StateInterface;
+use FGTCLB\EnvironmentStateManager\StateManagerExecuteMethodTrait;
+use FGTCLB\EnvironmentStateManager\StateManagerInterface;
+use FGTCLB\EnvironmentStateManager\StateManagerRootStateInterfaceHelperMethodsTrait;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+
+/**
+ * Default implementation of {@see StateManagerInterface} for TYPO3 v14.
+ *
+ * This class lives in the root-level `Core14/` folder and is loaded into the dependency injection
+ * container exclusively when the running TYPO3 major version is 14. The version-aware configuration
+ * in `EXT:environment_state_manager/Configuration/Services.php` only loads the `Core{major}/` folder
+ * matching `Typo3Version::getMajorVersion()`. The `#[AsAlias]` attribute below publishes this class
+ * as the version-agnostic {@see StateManagerInterface} service.
+ *
+ * @internal Concrete, TYPO3 v14 specific implementation of {@see StateManagerInterface}. Resolved
+ *           through dependency injection — type-hint the interface, not this class. Not covered by
+ *           the extension's public-API backward-compatibility promise.
+ */
+#[AsAlias(id: StateManagerInterface::class, public: true)]
+final class StateManager implements StateManagerInterface
+{
+    use StateManagerRootStateInterfaceHelperMethodsTrait;
+    use StateManagerExecuteMethodTrait;
+
+    /**
+     * @var State[]
+     */
+    private array $stack = [];
+
+    public function __construct(
+        private readonly EnvironmentBuilderFactoryInterface $environmentBuilderFactory,
+    ) {}
+
+    /**
+     * Creates a backup of the current environment and pushes it onto the snapshot stack.
+     */
+    public function backup(): void
+    {
+        $state = $this->backupStateInterface(new State());
+        $state = $this->dispatchStateBackupEvent($state);
+        /** @var State $state */
+        array_push($this->stack, $state);
+    }
+
+    /**
+     * Reset the environment to an empty state.
+     *
+     * **Be aware** that this method neither backs up nor restores the current environment.
+     */
+    public function reset(): void
+    {
+        $this->apply(new State());
+    }
+
+    /**
+     * Restore the last environment and remove it from the snapshot stack.
+     */
+    public function restore(): void
+    {
+        /** @var State $state */
+        $state = array_pop($this->stack) ?? new State();
+        $this->apply($state);
+    }
+
+    /**
+     * Creates a state for `$pageId` and populates the environment with it,
+     * returning the created state as {@see StateInterface}.
+     *
+     * **Be aware** that this method changes the environment without creating a backup
+     * of it or restoring it. For snapshot handling, see the following methods:
+     *
+     * - {@see StateManagerInterface::backup()}
+     * - {@see StateManagerInterface::restore()}
+     *
+     * @throws NoTypo3VersionCompatibleEnvironmentBuilderFound
+     */
+    public function bootstrap(StateBuildContext $stateBuildContext): StateInterface
+    {
+        $state = $this->environmentBuilderFactory->create($stateBuildContext)->build($stateBuildContext);
+        $this->apply($state);
+        return $state;
+    }
+
+    /**
+     * Applies the given state to the environment.
+     *
+     * **Be aware** that this method changes the environment without creating a backup
+     * of it or restoring it. See {@see StateManagerInterface::backup()} and
+     * {@see StateManagerInterface::restore()} for snapshot handling.
+     */
+    public function apply(StateInterface $state): void
+    {
+        $this->applyStateInterface($state);
+        $this->dispatchStateApplyEvent($state);
+    }
+}

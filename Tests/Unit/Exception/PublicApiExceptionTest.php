@@ -6,6 +6,7 @@ namespace FGTCLB\EnvironmentStateManager\Tests\Unit\Exception;
 
 use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound;
 use FGTCLB\EnvironmentStateManager\Exception\SiteConfigCouldNotBeDetermined;
+use FGTCLB\EnvironmentStateManager\Exception\UnsupportedApplicationType;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -39,5 +40,18 @@ final class PublicApiExceptionTest extends TestCase
         $this->assertInstanceOf(\RuntimeException::class, $exception);
         $this->assertSame('no site', $exception->getMessage());
         $this->assertSame(1762800001, $exception->getCode());
+    }
+
+    #[Test]
+    public function unsupportedApplicationTypeIsAThrowableRuntimeException(): void
+    {
+        $exception = new UnsupportedApplicationType('unsupported', 1784672688);
+
+        // Statically certain, but intentionally asserted: being a \RuntimeException is a public
+        // API promise consumers catch on, and must not silently change.
+        // @phpstan-ignore-next-line
+        $this->assertInstanceOf(\RuntimeException::class, $exception);
+        $this->assertSame('unsupported', $exception->getMessage());
+        $this->assertSame(1784672688, $exception->getCode());
     }
 }

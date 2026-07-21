@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\EnvironmentStateManager;
 
 use FGTCLB\EnvironmentStateManager\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound;
+use FGTCLB\EnvironmentStateManager\Exception\UnsupportedApplicationType;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -45,13 +46,28 @@ final class EnvironmentBuilderFactory implements EnvironmentBuilderFactoryInterf
      * the dependency injection container, which fails earlier when no `Core{major}/` folder matches
      * the running TYPO3 version. The exception stays part of the interface contract for
      * implementations resolving the builders lazily.
+     *
+     * The {@see UnsupportedApplicationType} declared on the interface is thrown only on TYPO3 v14+,
+     * where `ApplicationType::INSTALL` exists; on TYPO3 v13 the enum has only frontend and backend,
+     * so the guard below is unreachable and the tag is intentionally omitted here.
      */
     public function create(StateBuildContext $stateBuildContext): EnvironmentBuilderInterface
     {
-        return match ($stateBuildContext->applicationType) {
-            ApplicationType::FRONTEND => $this->frontendEnvironmentBuilder,
-            ApplicationType::BACKEND => $this->backendEnvironmentBuilder,
-            // ApplicationType has only two cases, so no default branch is needed. Omitting it keeps PHPStan happy.
-        };
+        // Keyed by application type value ('frontend', 'backend'). TYPO3 v14 added
+        // `ApplicationType::INSTALL`, for which no environment is built; a missing key therefore
+        // maps to an unsupported application type on every supported TYPO3 version.
+        // @var array<non-empty-string, EnvironmentBuilderInterface> $builders
+        $builders = [
+            ApplicationType::FRONTEND->value => $this->frontendEnvironmentBuilder,
+            ApplicationType::BACKEND->value => $this->backendEnvironmentBuilder,
+        ];
+        $applicationType = $stateBuildContext->applicationType->value;
+        if (!array_key_exists($applicationType, $builders)) {
+            throw new UnsupportedApplicationType(
+                sprintf('No environment builder available for application type "%s".', $applicationType),
+                1784672688,
+            );
+        }
+        return $builders[$applicationType];
     }
 }

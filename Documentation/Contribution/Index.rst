@@ -32,6 +32,9 @@ wrapper installs them for a specific TYPO3 core and PHP version:
     # Install dependencies for TYPO3 v13 on PHP 8.2 (default matrix).
     Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
 
+    # Switch the working copy to the TYPO3 v14 dependency set.
+    Build/Scripts/runTests.sh -t 14 -p 8.2 -s composerUpdate
+
 ..  note::
 
     Only ``composerUpdate`` installs the dependencies for the core version
@@ -70,11 +73,10 @@ phpunit flags must follow ``--``):
 
     Build/Scripts/runTests.sh -s functional -d sqlite -- --filter EnvironmentBuilderFactoryTest
 
-The functional :file:`Tests/Functional/Core13/` directory holds the TYPO3 core
-version specific tests. They are gated with phpunit groups
-(``not-core-<version>``) as soon as more than one TYPO3 major version is
-supported, so the wrapper automatically runs the set matching the installed
-core version.
+The functional :file:`Tests/Functional/Core13/` and
+:file:`Tests/Functional/Core14/` directories hold the TYPO3 core version
+specific tests, gated with phpunit groups (``not-core-13`` / ``not-core-14``),
+so the wrapper automatically runs the set matching the installed core version.
 
 ..  _contribution-quality:
 

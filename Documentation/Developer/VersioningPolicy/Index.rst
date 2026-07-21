@@ -40,12 +40,12 @@ backward-compatible path can be provided:
     entry and the commit is prefixed with ``[!!!]``.
 
 Not every change can go through a deprecation phase. TYPO3 core-version specific
-state, such as the :php:`TypoScriptFrontendController` accessors, lives on the
-TYPO3 core-version specific ``Core13`` ``ExtendedStateInterface`` and
-not on the version-agnostic :php:`StateInterface`. As the
-:php:`TypoScriptFrontendController` is deprecated in TYPO3 v13 and removed in
-TYPO3 v14, a future TYPO3 v14 extended interface will simply omit those
-accessors; the version-agnostic public contract stays untouched.
+state, such as the :php:`TypoScriptFrontendController` accessors, lives on a
+TYPO3 core-version specific ``ExtendedStateInterface`` and not on the
+version-agnostic :php:`StateInterface`. The :php:`TypoScriptFrontendController`
+is deprecated in TYPO3 v13 and removed in TYPO3 v14, so ``Core13`` provides an
+``ExtendedStateInterface`` carrying its accessors while ``Core14`` omits it
+entirely; the version-agnostic public contract stays untouched across both.
 
 TYPO3 core version support
 ==========================
