@@ -50,9 +50,10 @@ and also within functional tests to properly build the more global state.
 
 ## Compatibility
 
-| Branch | State          | Extension | TYPO3     | PHP       |
-|--------|----------------|-----------|-----------|-----------|
-| main   | active support | 1.x       | v12 / v13 | 8.1 – 8.5 |
+| Branch | State            | Extension | TYPO3     | PHP       |
+|--------|------------------|-----------|-----------|-----------|
+| main   | active support   | 2.x       | v13 / v14 | 8.2 – 8.5 |
+| 1      | maintenance      | 1.x       | v12 / v13 | 8.1 – 8.5 |
 
 ## Installation
 
