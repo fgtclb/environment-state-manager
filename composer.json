@@ -80,7 +80,7 @@
         "typo3/cms": {
             "extension-key": "environment_state_manager",
             "web-dir": ".Build/Web",
-            "version": "2.0.1",
+            "version": "2.0.2-dev",
             "Package": {
                 "providesPackages": []
             }
