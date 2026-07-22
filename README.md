@@ -157,8 +157,8 @@ Prerequisites:
 ```bash
 echo '>> Create release' ; \
   RELEASE_BRANCH='main' ; \
-  RELEASE_VERSION='2.0.0' ; \
-  DEV_VERSION='2.0.1' ; \
+  RELEASE_VERSION='2.0.1' ; \
+  DEV_VERSION='2.0.2' ; \
   echo ">> Checkout branches" && \
   git checkout main && \
   git fetch --all && \
