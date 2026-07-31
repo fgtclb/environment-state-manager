@@ -556,8 +556,6 @@ case ${TEST_SUITE} in
                 CONTAINERPARAMS="-e typo3DatabaseDriver=${DATABASE_DRIVER} -e typo3DatabaseName=func_test -e typo3DatabaseUsername=root -e typo3DatabaseHost=mariadb-func-${SUFFIX} -e typo3DatabasePassword=funcp"
                 ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${CONTAINERPARAMS} ${IMAGE_PHP} "${COMMAND[@]}"
                 SUITE_EXIT_CODE=$?
-                ${CONTAINER_BIN} exec mysql-func-${SUFFIX} /usr/bin/mysqladmin -uroot -pfuncp shutdown
-                sleep 10
                 ;;
             mysql)
                 echo "Using driver: ${DATABASE_DRIVER}"
