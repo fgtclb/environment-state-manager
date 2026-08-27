@@ -208,3 +208,30 @@ new version to the TYPO3 Extension Repository (TER).
 ## License
 
 GPL-2.0-or-later. See [LICENSE](LICENSE).
+
+## Supported Versions
+
+| Version | Supported          | End of Support |
+|---------|--------------------|----------------|
+| 2.x     | :white_check_mark: | 2029-06-30     |
+| 1.x     | :white_check_mark: | 2027-12-31     |
+
+## Security
+
+Found a vulnerability? Please report it privately via our
+[security report form](https://security.fgtclb.com) — **do not** open a public issue.
+See [SECURITY.md](SECURITY.md) for the full vulnerability disclosure policy,
+including what to expect and our safe harbor statement.
+
+## Simplified EU Declaration of Conformity (Annex VI)
+
+> Hereby, web-vision GmbH declares that the product with digital elements
+> type FGTCLB: Environment State Manager is in compliance with Regulation (EU) 2024/2847.
+>
+> The full text of the EU declaration of conformity is available at the
+> following internet address:
+> https://security.fgtclb.com/conformity/fgtclb/environment-state-manager/2.1.0/en/
+
+The full declarations are also included in this repository:
+[English](EU-Declaration-of-Conformity.md) ·
+[Deutsch](EU-Konformitaetserklaerung.md).
