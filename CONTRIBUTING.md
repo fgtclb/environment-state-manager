@@ -43,6 +43,10 @@ Build/Scripts/runTests.sh -s phpstan
 Build/Scripts/runTests.sh -s renderDocumentation
 ```
 
+`renderDocumentation` pulls the current renderer release before every run and
+fails on any warning the renderer logs, so a new renderer release can turn it
+red without a change in this repository.
+
 Please make sure `cgl -n`, `phpstan` and the unit and functional suites pass
 before opening a pull request. Run `Build/Scripts/runTests.sh -h` for all
 options.
