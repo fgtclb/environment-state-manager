@@ -97,6 +97,16 @@ Code quality
     # Render this documentation into Documentation-GENERATED-temp.
     Build/Scripts/runTests.sh -s renderDocumentation
 
+The documentation suite pulls
+``ghcr.io/typo3-documentation/render-guides:latest`` before it renders, so a
+local run uses the renderer release that CI and docs.typo3.org use, and the
+summary names it in a ``Renderer:`` line. When the pull fails, for example
+because the registry cannot be reached, the suite renders with the cached image,
+says so and marks the summary line with ``(cached, pull failed)``. Without a
+cached image it fails. The renderer runs with ``--fail-on-log --fail-on-error``,
+so a warning fails the suite as well. A new renderer release can therefore turn
+the suite red without a change in this repository.
+
 Please make sure ``cgl -n``, ``phpstan`` and the unit and functional test
 suites pass before opening a pull request.
 

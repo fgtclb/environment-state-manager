@@ -24,6 +24,9 @@ printSummary() {
     fi
     echo "PHP: ${PHP_VERSION}" >&2
     echo "TYPO3: ${CORE_VERSION}" >&2
+    if [[ -n "${RENDERER_INFO}" ]]; then
+        echo "Renderer: ${RENDERER_INFO}" >&2
+    fi
     if [[ ${TEST_SUITE} =~ ^(functional|functionalDeprecated|acceptance|acceptanceInstall)$ ]]; then
         case "${DBMS}" in
             mariadb|mysql|postgres)
@@ -44,6 +47,49 @@ printSummary() {
 
     # Exit with code of test suite - This script return non-zero if the executed test failed.
     exit $SUITE_EXIT_CODE
+}
+
+# Pull the documentation renderer before a run renders with it.
+#
+# The renderer is used by its "latest" tag on purpose, so the manual is checked
+# with the release docs.typo3.org renders it with. Neither docker nor podman
+# refreshes a tag it already has, though, so without this pull a local run
+# kept rendering with whatever release was pulled last, while CI pulled the
+# current one.
+#
+# Without a cached image the pull is retried, and a run without any renderer
+# fails. With a cached image a failed pull does not fail the run: a registry
+# that cannot be reached is no reason to lose the rendered output. It is
+# reported on stderr and again in the summary, because that run may not render
+# what docs.typo3.org renders. Fully offline the suite fails anyway, since the
+# renderer then cannot reach api.typo3.org and logs a warning for it.
+pullRenderer() {
+    local IMAGE=${1}
+    local MAX_ATTEMPTS=3
+    local ATTEMPT=1
+    local PULL_STATE=""
+    if ! ${CONTAINER_BIN} image inspect "${IMAGE}" >/dev/null 2>&1; then
+        while ! ${CONTAINER_BIN} pull "${IMAGE}"; do
+            if [ ${ATTEMPT} -ge ${MAX_ATTEMPTS} ]; then
+                echo "Could not pull ${IMAGE} after ${MAX_ATTEMPTS} attempts. Aborting." >&2
+                return 1
+            fi
+            echo "Pulling ${IMAGE} failed (attempt ${ATTEMPT} of ${MAX_ATTEMPTS}), retrying in $((ATTEMPT * 5))s." >&2
+            sleep $((ATTEMPT * 5))
+            ATTEMPT=$((ATTEMPT + 1))
+        done
+    elif ! ${CONTAINER_BIN} pull "${IMAGE}"; then
+        echo "" >&2
+        echo "###########################################################################" >&2
+        echo "WARNING: Could not pull ${IMAGE}." >&2
+        echo "Rendering with the cached image, which may be older than the release" >&2
+        echo "docs.typo3.org renders with." >&2
+        echo "###########################################################################" >&2
+        echo "" >&2
+        PULL_STATE=" (cached, pull failed)"
+    fi
+    RENDERER_INFO="render-guides $(${CONTAINER_BIN} image inspect "${IMAGE}" --format '{{index .Config.Labels "org.opencontainers.image.version"}}')${PULL_STATE}"
+    echo "Renderer: ${IMAGE}, ${RENDERER_INFO}" >&2
 }
 
 waitFor() {
@@ -202,6 +248,14 @@ Options:
             - unit (default): PHP unit tests
             - unitRandom: PHP unit tests in random order, "-- --random-order-seed=<number>" to use specific seed
 
+        renderDocumentation pulls the renderer ghcr.io/typo3-documentation/render-guides:latest
+        before it renders, so it renders with the release docs.typo3.org uses and not with an
+        older cached one. When the pull fails, for example because the registry cannot be
+        reached, it says so on stderr and renders with the cached image, and it fails when no
+        image is cached. The renderer runs with "--fail-on-log --fail-on-error", so a warning
+        fails the suite, and a new renderer release can turn it red without a change in this
+        repository.
+
     -b <docker|podman>
         Container environment:
             - docker
@@ -293,6 +347,7 @@ Options:
         Update existing typo3/core-testing-*:latest container images and remove dangling local volumes.
         New images are published once in a while and only the latest ones are supported by core testing.
         Use this if weird test errors occur. Also removes obsolete image versions of typo3/core-testing-*.
+        The renderer image is not touched, renderDocumentation pulls it on every run.
 
     -h
         Show this help.
@@ -331,6 +386,8 @@ fi
 
 # Option defaults
 TEST_SUITE="help"
+# Set by "pullRenderer" and printed in the summary.
+RENDERER_INFO=""
 CORE_VERSION="13"
 DBMS="sqlite"
 PHP_VERSION="8.2"
@@ -466,6 +523,8 @@ fi
 
 IMAGE_PHP="ghcr.io/typo3/core-testing-$(echo "php${PHP_VERSION}" | sed -e 's/\.//'):latest"
 IMAGE_ALPINE="docker.io/alpine:3.8"
+# The renderer of docs.typo3.org, by its "latest" tag on purpose and pulled before
+# every documentation run, see "pullRenderer".
 IMAGE_DOCS="ghcr.io/typo3-documentation/render-guides:latest"
 IMAGE_SELENIUM="docker.io/selenium/standalone-chrome:4.0.0-20211102"
 IMAGE_MARIADB="docker.io/mariadb:${DBMS_VERSION}"
@@ -632,8 +691,12 @@ case ${TEST_SUITE} in
         ;;
     renderDocumentation)
         cleanRenderedDocumentationFiles
-        ${CONTAINER_BIN} run ${DOCUMENTATION_COMMON_PARAMS} --name render-documentation-${SUFFIX} ${IMAGE_DOCS} --no-progress --fail-on-error --config=Documentation Documentation
-        SUITE_EXIT_CODE=$?
+        if ! pullRenderer "${IMAGE_DOCS}"; then
+            SUITE_EXIT_CODE=1
+        else
+            ${CONTAINER_BIN} run ${DOCUMENTATION_COMMON_PARAMS} --name render-documentation-${SUFFIX} ${IMAGE_DOCS} --no-progress --fail-on-log --fail-on-error --config=Documentation Documentation
+            SUITE_EXIT_CODE=$?
+        fi
         ;;
     unit)
         PHPUNIT_CONFIG_FILE="Build/phpunit/UnitTests.xml"
