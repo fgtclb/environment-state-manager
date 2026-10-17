@@ -104,6 +104,14 @@ can be used to render the documentation locally using the `Build/Scripts/runTest
 Build/Scripts/runTests.sh -s renderDocumentation
 ```
 
+The suite pulls `ghcr.io/typo3-documentation/render-guides:latest` before it
+renders, so a local run uses the renderer release CI and docs.typo3.org use,
+and the summary names that release. When the pull fails, it renders with the
+cached image and says so, and it fails when no image is cached. The renderer
+runs with `--fail-on-log --fail-on-error`, so a warning fails the suite as well.
+A new renderer release can therefore turn the suite red without a change in
+this repository.
+
 The implementation follows the recommendation from the TYPO3 Documentation team except not using the Makefile or
 Github Action approach in favour of the centralized `runTests.sh` wrapper approach.
 

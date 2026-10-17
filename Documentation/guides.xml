@@ -4,6 +4,7 @@
         links-are-relative="true"
 >
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               interlink-shortcode="fgtclb/environment-state-manager"
                project-home="https://github.com/fgtclb/environment-state-manager"
                project-contact="hello@fgtclb.com"
                project-repository="https://github.com/fgtclb/environment-state-manager"
